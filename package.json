@@ -4,15 +4,17 @@
   "description": "Multi-tenant project and task management platform",
   "workspaces": ["server", "client"],
   "scripts": {
-    "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
+    "dev": "node scripts/dev-with-db.js",
+    "dev:only": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
     "dev:server": "cd server && bun run dev",
     "dev:client": "cd client && bun run dev",
     "build": "bun run build:server && bun run build:client",
     "build:server": "cd server && bun run build",
     "build:client": "cd client && bun run build",
-    "db:start": "bash scripts/start-db.sh",
-    "db:stop": "bash scripts/stop-db.sh",
-    "db:reset": "bash scripts/reset-db.sh",
+    "db:start": "node scripts/start-db.js",
+    "db:stop": "node scripts/stop-db.js",
+    "db:reset": "node scripts/reset-db.js",
+    "db:check": "node scripts/check-db.js",
     "db:studio": "cd server && bun run db:studio"
   },
   "devDependencies": {

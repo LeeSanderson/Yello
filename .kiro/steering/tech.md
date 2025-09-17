@@ -59,10 +59,15 @@ bun run build        # Build both
 bun run build:server # Backend build
 bun run build:client # Frontend build
 
-# Database management
+# Development (with automatic database)
+bun run dev          # Start everything (auto-starts database)
+bun run dev:only     # Start servers only (no database check)
+
+# Database management (cross-platform)
 bun run db:start     # Start PostgreSQL with Podman
 bun run db:stop      # Stop database container
 bun run db:reset     # Reset database (fresh start)
+bun run db:check     # Check if database is running
 bun run db:studio    # Open Drizzle Studio
 
 # Backend specific

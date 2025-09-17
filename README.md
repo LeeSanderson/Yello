@@ -7,6 +7,7 @@ Multi-tenant project and task management platform that helps teams organize work
 ### Prerequisites
 - [Bun](https://bun.sh/) (latest version)
 - [Podman](https://podman.io/) (for local database)
+- [Node.js](https://nodejs.org/) (for cross-platform scripts)
 
 ### Installation
 
@@ -22,15 +23,16 @@ cd ../client && bun install
 cd ..
 ```
 
-3. Start the database:
-```bash
-bun run db:start
-```
-
-4. Start development servers:
+3. Start development (automatically starts database):
 ```bash
 bun run dev
 ```
+
+The `bun run dev` command will automatically:
+- Check if the database is running
+- Start the database if needed (using Podman)
+- Wait for the database to be ready
+- Start both server and client development servers
 
 This will start:
 - Backend API server on http://localhost:3000
@@ -57,23 +59,22 @@ bun run dev:client
 
 ## Database Management
 
-**Start database:**
+**Development with auto-database:**
+```bash
+bun run dev         # Start everything (database + servers)
+```
+
+**Development servers only:**
+```bash
+bun run dev:only    # Start servers without database check
+```
+
+**Manual database management:**
 ```bash
 bun run db:start    # Start PostgreSQL with Podman
-```
-
-**Stop database:**
-```bash
 bun run db:stop     # Stop the database container
-```
-
-**Reset database:**
-```bash
 bun run db:reset    # Remove container and data (fresh start)
-```
-
-**Database studio:**
-```bash
+bun run db:check    # Check if database is running
 bun run db:studio   # Open Drizzle Studio (database GUI)
 ```
 
