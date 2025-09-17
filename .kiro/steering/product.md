@@ -1,12 +1,12 @@
 # Product Overview
 
-This is a new project workspace. The specific product details and requirements should be defined as the project develops.
+Yellow is a multi-tenant project and task management platform that helps teams organize work, collaborate, and track progress across projects within shared workspaces.
 
-## Key Considerations
-- Define clear project goals and scope
-- Identify target users and use cases
-- Establish success metrics and requirements
-- Document any specific business rules or constraints
-
-## Notes
-This document should be updated with specific product information as the project evolves.
+## High-Level requiremetns
+- Support multi-tenant workspaces with secure data isolation.
+- Provide user authentication and role-based access control (admin, member, guest).
+- Allow project creation and management within a workspace.
+- Enable task management (creation, assignment, due dates, statuses).
+- Provide a basic activity feed for task and project updates.
+- Ensure scalability to support multiple organizations and users concurrently.
+- Deliver fast, reliable performance with secure data storage.
