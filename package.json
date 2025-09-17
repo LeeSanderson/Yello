@@ -9,7 +9,11 @@
     "dev:client": "cd client && bun run dev",
     "build": "bun run build:server && bun run build:client",
     "build:server": "cd server && bun run build",
-    "build:client": "cd client && bun run build"
+    "build:client": "cd client && bun run build",
+    "db:start": "bash scripts/start-db.sh",
+    "db:stop": "bash scripts/stop-db.sh",
+    "db:reset": "bash scripts/reset-db.sh",
+    "db:studio": "cd server && bun run db:studio"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

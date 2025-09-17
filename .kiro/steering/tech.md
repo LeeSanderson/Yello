@@ -14,7 +14,8 @@ This document outlines the technical foundation and conventions for the Yellow p
 - **Language**: TypeScript
 - **Runtime**: Bun
 - **Framework**: Hono (lightweight web framework)
-- **Database**: TBD (PostgreSQL recommended for multi-tenancy)
+- **Database**: PostgreSQL 15 with Drizzle ORM
+- **Container Runtime**: Podman for local development
 - **Testing**: Bun's built-in test runner
 
 ### Frontend (client/)
@@ -58,11 +59,19 @@ bun run build        # Build both
 bun run build:server # Backend build
 bun run build:client # Frontend build
 
+# Database management
+bun run db:start     # Start PostgreSQL with Podman
+bun run db:stop      # Stop database container
+bun run db:reset     # Reset database (fresh start)
+bun run db:studio    # Open Drizzle Studio
+
 # Backend specific
 cd server
 bun run dev          # Development with watch mode
 bun run build        # Build to dist/
 bun run start        # Run built version
+bun run db:generate  # Generate database migrations
+bun run db:migrate   # Apply database migrations
 
 # Frontend specific
 cd client
