@@ -14,7 +14,14 @@ Multi-tenant project and task management platform that helps teams organize work
 bun install
 ```
 
-2. Start development servers:
+2. Install dependencies for each workspace:
+```bash
+cd server && bun install
+cd ../client && bun install
+cd ..
+```
+
+3. Start development servers:
 ```bash
 bun run dev
 ```

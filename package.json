@@ -4,7 +4,7 @@
   "description": "Multi-tenant project and task management platform",
   "workspaces": ["server", "client"],
   "scripts": {
-    "dev": "bun run --parallel dev:server dev:client",
+    "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
     "dev:server": "cd server && bun run dev",
     "dev:client": "cd client && bun run dev",
     "build": "bun run build:server && bun run build:client",
@@ -12,6 +12,7 @@
     "build:client": "cd client && bun run build"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "concurrently": "^8.2.0"
   }
 }
