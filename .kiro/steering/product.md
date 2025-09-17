@@ -15,22 +15,29 @@ Yellow is a multi-tenant project and task management platform that helps teams o
 - Use workspace-scoped API endpoints (e.g., `/api/workspaces/{id}/projects`)
 
 ### User Management & Access Control
-- Three role levels: **admin** (full workspace control), **member** (create/edit), **guest** (read-only)
-- Implement role-based middleware for all protected routes
-- Admins can manage workspace settings and user permissions
-- Members can create projects and tasks, assign work
-- Guests have read-only access to assigned projects/tasks
+- Users are global entities that can belong to multiple workspaces
+- Three role levels per workspace: **admin** (full workspace control), **member** (create/edit), **guest** (read-only)
+- Memberships define the relationship between users and workspaces with specific roles
+- Implement role-based middleware for all protected routes using membership context
+- Admins can manage workspace settings and user permissions within their workspace
+- Members can create projects and tasks, assign work within their workspace
+- Guests have read-only access to assigned projects/tasks within their workspace
 
 ### Core Entities & Relationships
 ```
+User (global entity)
+├── Memberships
+│   └── Workspace + Role
+└── Personal Activity Feed (across all workspaces)
+
 Workspace (tenant boundary)
-├── Users (with roles)
+├── Memberships (User + Role)
 ├── Projects
 │   └── Tasks
-│       ├── Assignees (Users)
+│       ├── Assignees (Users via Memberships)
 │       ├── Due dates
 │       └── Status (todo, in-progress, done, blocked)
-└── Activity Feed
+└── Workspace-scoped data
 ```
 
 ### Task Management Conventions
@@ -41,10 +48,12 @@ Workspace (tenant boundary)
 - Task updates trigger activity feed entries
 
 ### Activity Feed Requirements
-- Track project creation, task creation/updates, assignments
-- Include actor (who), action (what), timestamp (when), and context (where)
-- Scope activity to workspace level
+- Track project creation, task creation/updates, assignments across all user's workspaces
+- Include actor (who), action (what), timestamp (when), workspace context (where), and target (what was affected)
+- Activity feed is user-specific and aggregates events from all workspaces the user belongs to
+- Each activity entry includes workspace information for proper context and filtering
 - Implement real-time updates where possible
+- Support filtering by workspace, project, or activity type
 
 ## Development Guidelines
 
@@ -56,19 +65,24 @@ Workspace (tenant boundary)
 
 ### Data Validation
 - Validate all user inputs at API boundaries
-- Ensure workspace membership before allowing operations
-- Validate role permissions for destructive actions
+- Ensure user has valid membership in workspace before allowing operations
+- Validate role permissions through membership context for destructive actions
 - Sanitize user-generated content (project names, task descriptions)
+- Verify user membership exists and is active before workspace operations
 
 ### Performance Considerations
-- Index database queries by workspace_id + relevant fields
-- Implement caching for frequently accessed workspace data
-- Use database transactions for multi-table operations
-- Consider read replicas for activity feed queries
+- Index database queries by workspace_id + relevant fields for workspace-scoped data
+- Index membership queries by user_id + workspace_id for access control
+- Index activity feed queries by user_id + timestamp for efficient user feed retrieval
+- Implement caching for frequently accessed workspace data and user memberships
+- Use database transactions for multi-table operations (especially membership changes)
+- Consider read replicas for activity feed queries across multiple workspaces
 
 ### Security Requirements
-- Authenticate all API requests
-- Authorize based on workspace membership and role
+- Authenticate all API requests using global user identity
+- Authorize based on user's membership in specific workspace and associated role
 - Use HTTPS for all communications
-- Implement rate limiting per workspace
-- Log security-relevant events (failed auth, permission denials)
+- Implement rate limiting per user across all workspaces
+- Log security-relevant events (failed auth, permission denials, membership changes)
+- Ensure membership validation occurs before any workspace-scoped operations
+- Protect against cross-workspace data leakage through membership verification
