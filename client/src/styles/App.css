@@ -1,0 +1,90 @@
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.app-header {
+  margin-bottom: 3rem;
+}
+
+.app-header h1 {
+  font-size: 3rem;
+  margin: 0;
+  color: #ffd700;
+}
+
+.app-header p {
+  font-size: 1.2rem;
+  color: #888;
+  margin: 0.5rem 0 0 0;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.welcome-section {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+.welcome-section h2 {
+  margin-top: 0;
+  color: #ffd700;
+}
+
+.api-test {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.api-test h3 {
+  margin-top: 0;
+}
+
+.success {
+  color: #4ade80;
+  font-weight: 500;
+}
+
+.error {
+  color: #f87171;
+  font-weight: 500;
+}
+
+.features {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.features h3 {
+  margin-top: 0;
+}
+
+.features ul {
+  text-align: left;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.features li {
+  margin: 0.5rem 0;
+  color: #ccc;
+}
+
+@media (max-width: 768px) {
+  .app {
+    padding: 1rem;
+  }
+  
+  .app-header h1 {
+    font-size: 2rem;
+  }
+}

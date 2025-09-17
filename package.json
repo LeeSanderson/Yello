@@ -1,0 +1,17 @@
+{
+  "name": "yellow",
+  "version": "1.0.0",
+  "description": "Multi-tenant project and task management platform",
+  "workspaces": ["server", "client"],
+  "scripts": {
+    "dev": "bun run --parallel dev:server dev:client",
+    "dev:server": "cd server && bun run dev",
+    "dev:client": "cd client && bun run dev",
+    "build": "bun run build:server && bun run build:client",
+    "build:server": "cd server && bun run build",
+    "build:client": "cd client && bun run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
