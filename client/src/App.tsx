@@ -1,25 +1,27 @@
 import { useState, useEffect } from 'react';
 import './styles/App.css';
 
-interface ApiResponse {
-  message: string;
+interface HealthResponse {
+  status: 'ok' | 'error';
+  service: string;
+  database: 'connected' | 'disconnected';
   timestamp: string;
 }
 
 function App() {
-  const [apiMessage, setApiMessage] = useState<string>('');
+  const [healthStatus, setHealthStatus] = useState<HealthResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    const fetchHello = async () => {
+    const fetchHealth = async () => {
       try {
-        const response = await fetch('/api/hello');
+        const response = await fetch('/api/health');
         if (!response.ok) {
-          throw new Error('Failed to fetch');
+          throw new Error('Failed to fetch health status');
         }
-        const data: ApiResponse = await response.json();
-        setApiMessage(data.message);
+        const data: HealthResponse = await response.json();
+        setHealthStatus(data);
       } catch (err) {
         setError('Failed to connect to API');
         console.error('API Error:', err);
@@ -28,7 +30,7 @@ function App() {
       }
     };
 
-    fetchHello();
+    fetchHealth();
   }, []);
 
   return (
@@ -44,11 +46,34 @@ function App() {
           <p>Your collaborative workspace for managing projects and tasks across teams.</p>
         </div>
 
-        <div className="api-test">
-          <h3>API Connection Test</h3>
-          {loading && <p>Connecting to API...</p>}
+        <div className="system-status">
+          <h3>System Status</h3>
+          {loading && <p>Checking system status...</p>}
           {error && <p className="error">❌ {error}</p>}
-          {apiMessage && <p className="success">✅ {apiMessage}</p>}
+          {healthStatus && (
+            <div className="status-grid">
+              <div className="status-item">
+                <span className="status-label">API Server:</span>
+                <span className={`status-value ${healthStatus.status === 'ok' ? 'success' : 'error'}`}>
+                  {healthStatus.status === 'ok' ? '✅ Online' : '❌ Offline'}
+                </span>
+              </div>
+              <div className="status-item">
+                <span className="status-label">Database:</span>
+                <span className={`status-value ${healthStatus.database === 'connected' ? 'success' : 'error'}`}>
+                  {healthStatus.database === 'connected' ? '✅ Connected' : '❌ Disconnected'}
+                </span>
+              </div>
+              <div className="status-item">
+                <span className="status-label">Service:</span>
+                <span className="status-value">{healthStatus.service}</span>
+              </div>
+              <div className="status-item">
+                <span className="status-label">Last Check:</span>
+                <span className="status-value">{new Date(healthStatus.timestamp).toLocaleTimeString()}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="features">

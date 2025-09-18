@@ -13,13 +13,6 @@ app.use('*', cors({
 }));
 
 // Routes
-app.get('/api/hello', (c) => {
-  return c.json({ 
-    message: 'Hello World from Yellow API!',
-    timestamp: new Date().toISOString()
-  });
-});
-
 app.get('/api/health', async (c) => {
   const dbConnected = await testConnection();
   return c.json({ 

@@ -10,5 +10,6 @@ export interface ApiResponse<T = any> {
 export interface HealthCheck {
   status: 'ok' | 'error';
   service: string;
-  timestamp?: string;
+  database: 'connected' | 'disconnected';
+  timestamp: string;
 }

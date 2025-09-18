@@ -80,8 +80,7 @@ bun run db:studio   # Open Drizzle Studio (database GUI)
 
 ## API Endpoints
 
-- `GET /api/hello` - Hello world endpoint
-- `GET /api/health` - Health check (includes database status)
+- `GET /api/health` - System health check (API server + database status)
 - `GET /api/users` - List all users
 - `GET /api/workspaces` - List all workspaces
 - `GET /api/projects` - List all projects
