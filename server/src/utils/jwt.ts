@@ -1,4 +1,5 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
+import { StringValue } from 'ms';
 
 interface JWTPayload {
     userId: string;
@@ -14,8 +15,8 @@ export class JWTUtils {
         return secret;
     }
 
-    private static getExpiresIn(): string {
-        return process.env.JWT_EXPIRES_IN || '24h';
+    private static getExpiresIn(): StringValue {
+        return '24h';
     }
 
     /**
@@ -28,9 +29,11 @@ export class JWTUtils {
         };
 
 
-        return jwt.sign(payload, this.getSecret(), {
+        const options: SignOptions = {
             expiresIn: this.getExpiresIn(),
-        } as SignOptions);
+        };
+
+        return jwt.sign(payload, this.getSecret(), options);
     }
 
     /**

@@ -98,6 +98,12 @@ bun run preview      # Preview production build
 - Use shared types from `shared/` directory
 - Implement proper error handling with typed errors
 - Use absolute imports with path mapping (@/ aliases)
+- **Avoid `any` type**: Never use `any` type when generating code or fixing bugs
+- Use proper type assertions with specific types (e.g., `as string`, `as MyInterface`)
+- Prefer union types, generics, and proper interfaces over `any`
+- When dealing with third-party library type issues, use specific type assertions or create custom type definitions
+- Use `unknown` type instead of `any` when the type is truly unknown
+- Implement proper type guards for runtime type checking
 
 ### API Development
 - Use RESTful conventions with workspace scoping
