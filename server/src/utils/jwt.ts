@@ -27,9 +27,10 @@ export class JWTUtils {
             email,
         };
 
+
         return jwt.sign(payload, this.getSecret(), {
             expiresIn: this.getExpiresIn(),
-        } as any);
+        } as SignOptions);
     }
 
     /**
