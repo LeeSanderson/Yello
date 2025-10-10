@@ -17,6 +17,7 @@ This document outlines the technical foundation and conventions for the Yellow p
 - **Database**: PostgreSQL 15 with Drizzle ORM
 - **Container Runtime**: Podman for local development
 - **Testing**: Bun's built-in test runner
+- **Test Files**: Adjacent to source files with `.test.ts` suffix
 
 ### Frontend (client/)
 - **Language**: TypeScript
@@ -25,6 +26,8 @@ This document outlines the technical foundation and conventions for the Yellow p
 - **Bundler**: Vite (Rollup-based)
 - **Styling**: CSS (with potential for CSS modules or styled-components)
 - **State Management**: TBD (Zustand recommended for simplicity)
+- **Testing**: Vitest (configured with Vite)
+- **Test Files**: Adjacent to components with `.test.tsx` suffix
 
 ### Shared
 - **Language**: TypeScript
@@ -70,6 +73,11 @@ bun run db:reset     # Reset database (fresh start)
 bun run db:check     # Check if database is running
 bun run db:studio    # Open Drizzle Studio
 
+# Testing
+bun test             # Run all tests
+bun test --watch     # Run tests in watch mode
+bun test --coverage  # Run tests with coverage report
+
 # Backend specific
 cd server
 bun run dev          # Development with watch mode
@@ -77,12 +85,14 @@ bun run build        # Build to dist/
 bun run start        # Run built version
 bun run db:generate  # Generate database migrations
 bun run db:migrate   # Apply database migrations
+bun test             # Run backend tests
 
 # Frontend specific
 cd client
 bun run dev          # Vite dev server
 bun run build        # Production build
 bun run preview      # Preview production build
+bun test             # Run frontend tests
 ```
 
 ## Development Guidelines
@@ -122,6 +132,13 @@ bun run preview      # Preview production build
 - Use Vite's HMR for instant feedback
 - Implement proper code splitting for production
 - Consider lazy loading for large components
+
+### Testing Requirements
+- **Unit Tests**: Required for all new functionality
+- **Test Coverage**: Aim for 80%+ coverage on new code
+- **Test Execution**: Tests must pass before considering tasks complete
+- **Test-Driven Development**: Write tests alongside or before implementation
+- **Integration Tests**: Required for API endpoints and cross-component interactions
 
 ### Security
 - Validate all user inputs

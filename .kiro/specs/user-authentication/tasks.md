@@ -13,17 +13,27 @@
     - Create user creation with proper error handling
     - _Requirements: 1.1, 1.2, 1.5, 4.1, 4.2_
 
-  - [ ] 2.2 Implement user login service
+  - [ ] 2.2 Write unit tests for user registration service
+    - Create unit tests for registration service validation
+    - Test email uniqueness validation scenarios
+    - Test password hashing integration
+    - Test error handling for invalid inputs
+    - Run tests to verify registration service works correctly
+    - _Requirements: 1.1, 1.2, 1.5, 4.1, 4.2_
+
+  - [ ] 2.3 Implement user login service
     - Write login authentication logic with credential validation
     - Implement secure password comparison using bcrypt
     - Generate JWT tokens upon successful authentication
     - _Requirements: 2.1, 2.4, 4.3, 4.4_
 
-  - [ ] 2.3 Write unit tests for authentication services
-    - Create unit tests for registration service validation
+  - [ ] 2.4 Write unit tests for user login service
     - Write unit tests for login service authentication
-    - Test password hashing and comparison functions
-    - _Requirements: 1.1, 1.2, 2.1, 4.1, 4.2, 4.3_
+    - Test password comparison functionality
+    - Test JWT token generation
+    - Test error handling for invalid credentials
+    - Run tests to verify login service works correctly
+    - _Requirements: 2.1, 2.4, 4.3, 4.4_
 
 - [ ] 3. Create input validation schemas
   - [ ] 3.1 Implement registration validation schema
@@ -32,9 +42,22 @@
     - Add name field validation for user registration
     - _Requirements: 1.2, 1.3, 1.4_
 
-  - [ ] 3.2 Implement login validation schema
+  - [ ] 3.2 Write unit tests for registration validation schema
+    - Test email format validation with valid and invalid emails
+    - Test password length and strength requirements
+    - Test name field validation
+    - Run tests to verify validation schema works correctly
+    - _Requirements: 1.2, 1.3, 1.4_
+
+  - [ ] 3.3 Implement login validation schema
     - Create Zod schema for login request validation
     - Validate email and password field presence
+    - _Requirements: 2.2, 2.3_
+
+  - [ ] 3.4 Write unit tests for login validation schema
+    - Test login request validation with valid and invalid inputs
+    - Test email and password field presence validation
+    - Run tests to verify login validation schema works correctly
     - _Requirements: 2.2, 2.3_
 
 - [ ] 4. Create authentication middleware
@@ -44,9 +67,24 @@
     - Handle token expiration and invalid token scenarios
     - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.2, 5.3, 5.4_
 
-  - [ ] 4.2 Create optional authentication middleware
+  - [ ] 4.2 Write unit tests for JWT authentication middleware
+    - Test token extraction from Authorization header
+    - Test user context attachment for valid tokens
+    - Test error handling for expired and invalid tokens
+    - Test middleware behavior with missing tokens
+    - Run tests to verify authentication middleware works correctly
+    - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.2, 5.3, 5.4_
+
+  - [ ] 4.3 Create optional authentication middleware
     - Implement middleware that allows both authenticated and unauthenticated access
     - Attach user context when token is present and valid
+    - _Requirements: 5.5_
+
+  - [ ] 4.4 Write unit tests for optional authentication middleware
+    - Test middleware behavior with valid tokens
+    - Test middleware behavior without tokens
+    - Test middleware behavior with invalid tokens
+    - Run tests to verify optional authentication middleware works correctly
     - _Requirements: 5.5_
 
 - [ ] 5. Implement authentication API routes
@@ -56,20 +94,49 @@
     - Return appropriate success and error responses
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-  - [ ] 5.2 Create user login endpoint
+  - [ ] 5.2 Write unit tests for user registration endpoint
+    - Test registration endpoint with valid user data
+    - Test registration endpoint with invalid email formats
+    - Test registration endpoint with weak passwords
+    - Test registration endpoint with duplicate emails
+    - Run tests to verify registration endpoint works correctly
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+
+  - [ ] 5.3 Create user login endpoint
     - Implement POST /api/auth/login route handler
     - Integrate login validation and authentication service
     - Return JWT token and user information on success
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-  - [ ] 5.3 Create user profile endpoint
+  - [ ] 5.4 Write unit tests for user login endpoint
+    - Test login endpoint with valid credentials
+    - Test login endpoint with invalid credentials
+    - Test login endpoint with non-existent users
+    - Test JWT token generation in response
+    - Run tests to verify login endpoint works correctly
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+
+  - [ ] 5.5 Create user profile endpoint
     - Implement GET /api/auth/me route with authentication middleware
     - Return current user information for authenticated requests
     - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.3_
 
-  - [ ] 5.4 Create logout endpoint
+  - [ ] 5.6 Write unit tests for user profile endpoint
+    - Test profile endpoint with valid authentication
+    - Test profile endpoint without authentication
+    - Test profile endpoint with expired tokens
+    - Run tests to verify profile endpoint works correctly
+    - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.3_
+
+  - [ ] 5.7 Create logout endpoint
     - Implement POST /api/auth/logout route handler
     - Handle session invalidation (client-side token removal)
+    - _Requirements: 3.4_
+
+  - [ ] 5.8 Write unit tests for logout endpoint
+    - Test logout endpoint functionality
+    - Test logout endpoint response format
+    - Run tests to verify logout endpoint works correctly
     - _Requirements: 3.4_
 
 - [ ] 6. Integrate authentication routes with main application
@@ -78,13 +145,28 @@
     - Ensure proper route ordering and middleware application
     - _Requirements: 1.1, 2.1, 3.1, 5.1_
 
-  - [ ] 6.2 Update existing routes with authentication middleware
+  - [ ] 6.2 Write integration tests for route registration
+    - Test that authentication routes are properly mounted
+    - Test route ordering and middleware application
+    - Run tests to verify route integration works correctly
+    - _Requirements: 1.1, 2.1, 3.1, 5.1_
+
+  - [ ] 6.3 Update existing routes with authentication middleware
     - Apply authentication middleware to protected routes
     - Maintain backward compatibility for public routes
     - _Requirements: 5.1, 5.2, 5.3, 5.5_
 
-- [ ] 7. Create integration tests for authentication endpoints
-  - Write integration tests for registration endpoint with various input scenarios
-  - Create integration tests for login endpoint with valid and invalid credentials
-  - Test protected route access with and without authentication
-  - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3_
+  - [ ] 6.4 Write integration tests for protected routes
+    - Test protected route access with valid authentication
+    - Test protected route access without authentication
+    - Test protected route access with expired tokens
+    - Run tests to verify protected routes work correctly
+    - _Requirements: 5.1, 5.2, 5.3, 5.5_
+
+- [ ] 7. Create comprehensive integration tests for authentication flow
+  - [ ] 7.1 Write end-to-end authentication flow tests
+    - Test complete registration → login → protected access flow
+    - Test authentication error scenarios and edge cases
+    - Test token expiration and refresh scenarios
+    - Run tests to verify complete authentication system works correctly
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3_
