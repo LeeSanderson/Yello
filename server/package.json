@@ -5,6 +5,8 @@
     "dev": "bun --watch src/index.ts",
     "build": "bun build src/index.ts --outdir ./dist --target bun",
     "start": "bun dist/index.js",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
     "db:generate": "drizzle-kit generate:pg",
     "db:migrate": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio"
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/bun": "^1.2.23",
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pg": "^8.10.0",
