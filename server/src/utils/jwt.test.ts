@@ -77,7 +77,7 @@ describe('JWTUtils', () => {
 
             expect(() => {
                 JWTUtils.verifyToken(token);
-            }).toThrow('Token verification failed');
+            }).toThrow('JWT_SECRET environment variable is required');
         });
 
         it('should throw error for token signed with different secret', () => {
