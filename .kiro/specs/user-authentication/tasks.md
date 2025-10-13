@@ -143,12 +143,15 @@
     - Implement GET /api/auth/me route with authentication middleware
     - Return current user information for authenticated requests
     - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.3_
+    - _Reuses: JWT authentication middleware (task 4.1), UserService (task 2.1)_
 
   - [ ] 5.6 Write unit tests for user profile endpoint
     - Test profile endpoint with valid authentication
     - Test profile endpoint without authentication
     - Test profile endpoint with expired tokens
     - Run tests to verify profile endpoint works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.3_
 
   - [ ] 5.7 Create logout endpoint
@@ -160,6 +163,8 @@
     - Test logout endpoint functionality
     - Test logout endpoint response format
     - Run tests to verify logout endpoint works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 3.4_
 
 - [ ] 6. Integrate authentication routes with main application
@@ -167,23 +172,29 @@
     - Import and mount authentication routes in the main Hono app
     - Ensure proper route ordering and middleware application
     - _Requirements: 1.1, 2.1, 3.1, 5.1_
+    - _Reuses: All authentication endpoints (tasks 5.1, 5.3, 5.5, 5.7)_
 
   - [ ] 6.2 Write integration tests for route registration
     - Test that authentication routes are properly mounted
     - Test route ordering and middleware application
     - Run tests to verify route integration works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 1.1, 2.1, 3.1, 5.1_
 
   - [ ] 6.3 Update existing routes with authentication middleware
     - Apply authentication middleware to protected routes
     - Maintain backward compatibility for public routes
     - _Requirements: 5.1, 5.2, 5.3, 5.5_
+    - _Reuses: JWT authentication middleware (task 4.1), Optional authentication middleware (task 4.3)_
 
   - [ ] 6.4 Write integration tests for protected routes
     - Test protected route access with valid authentication
     - Test protected route access without authentication
     - Test protected route access with expired tokens
     - Run tests to verify protected routes work correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 5.1, 5.2, 5.3, 5.5_
 
 - [ ] 7. Create comprehensive integration tests for authentication flow
@@ -192,4 +203,7 @@
     - Test authentication error scenarios and edge cases
     - Test token expiration and refresh scenarios
     - Run tests to verify complete authentication system works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3_
+    - _Reuses: All authentication components (services, middleware, endpoints, validation schemas)_
