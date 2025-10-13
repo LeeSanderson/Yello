@@ -12,6 +12,7 @@
     - Implement password hashing before database storage
     - Create user creation with proper error handling
     - _Requirements: 1.1, 1.2, 1.5, 4.1, 4.2_
+    - _Reuses: JWT utilities (task 1), password hashing utilities (task 1)_
 
   - [ ] 2.2 Write unit tests for user registration service
     - Create unit tests for registration service validation
@@ -19,6 +20,8 @@
     - Test password hashing integration
     - Test error handling for invalid inputs
     - Run tests to verify registration service works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 1.1, 1.2, 1.5, 4.1, 4.2_
 
   - [ ] 2.3 Implement user login service
@@ -26,6 +29,7 @@
     - Implement secure password comparison using bcrypt
     - Generate JWT tokens upon successful authentication
     - _Requirements: 2.1, 2.4, 4.3, 4.4_
+    - _Reuses: JWT utilities (task 1), password hashing utilities (task 1), UserService (task 2.1)_
 
   - [ ] 2.4 Write unit tests for user login service
     - Write unit tests for login service authentication
@@ -33,6 +37,8 @@
     - Test JWT token generation
     - Test error handling for invalid credentials
     - Run tests to verify login service works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 2.1, 2.4, 4.3, 4.4_
 
 - [ ] 3. Create input validation schemas
@@ -47,17 +53,22 @@
     - Test password length and strength requirements
     - Test name field validation
     - Run tests to verify validation schema works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 1.2, 1.3, 1.4_
 
   - [ ] 3.3 Implement login validation schema
     - Create Zod schema for login request validation
     - Validate email and password field presence
     - _Requirements: 2.2, 2.3_
+    - _Reuses: Email validation schema (task 3.1)_
 
   - [ ] 3.4 Write unit tests for login validation schema
     - Test login request validation with valid and invalid inputs
     - Test email and password field presence validation
     - Run tests to verify login validation schema works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 2.2, 2.3_
 
 - [ ] 4. Create authentication middleware
@@ -66,6 +77,7 @@
     - Attach user context to authenticated requests
     - Handle token expiration and invalid token scenarios
     - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.2, 5.3, 5.4_
+    - _Reuses: JWT utilities (task 1), UserService (task 2.1)_
 
   - [ ] 4.2 Write unit tests for JWT authentication middleware
     - Test token extraction from Authorization header
@@ -73,18 +85,23 @@
     - Test error handling for expired and invalid tokens
     - Test middleware behavior with missing tokens
     - Run tests to verify authentication middleware works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.2, 5.3, 5.4_
 
   - [ ] 4.3 Create optional authentication middleware
     - Implement middleware that allows both authenticated and unauthenticated access
     - Attach user context when token is present and valid
     - _Requirements: 5.5_
+    - _Reuses: JWT authentication middleware (task 4.1)_
 
   - [ ] 4.4 Write unit tests for optional authentication middleware
     - Test middleware behavior with valid tokens
     - Test middleware behavior without tokens
     - Test middleware behavior with invalid tokens
     - Run tests to verify optional authentication middleware works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 5.5_
 
 - [ ] 5. Implement authentication API routes
@@ -93,6 +110,7 @@
     - Integrate input validation and registration service
     - Return appropriate success and error responses
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+    - _Reuses: Registration validation schema (task 3.1), UserService (task 2.1)_
 
   - [ ] 5.2 Write unit tests for user registration endpoint
     - Test registration endpoint with valid user data
@@ -100,6 +118,8 @@
     - Test registration endpoint with weak passwords
     - Test registration endpoint with duplicate emails
     - Run tests to verify registration endpoint works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
   - [ ] 5.3 Create user login endpoint
@@ -107,6 +127,7 @@
     - Integrate login validation and authentication service
     - Return JWT token and user information on success
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+    - _Reuses: Login validation schema (task 3.3), Login service (task 2.3)_
 
   - [ ] 5.4 Write unit tests for user login endpoint
     - Test login endpoint with valid credentials
@@ -114,6 +135,8 @@
     - Test login endpoint with non-existent users
     - Test JWT token generation in response
     - Run tests to verify login endpoint works correctly
+    - **Run full test suite to catch any regressions**
+    - Fix any failing tests before proceeding
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
   - [ ] 5.5 Create user profile endpoint
