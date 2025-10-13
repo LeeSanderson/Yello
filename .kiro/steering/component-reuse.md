@@ -162,7 +162,9 @@ When testing component reuse:
 - **Test existing functionality**: Ensure existing features still work
 - **Test new functionality**: Verify new features work correctly
 - **Test integration**: Verify new and existing functionality work together
+- **Run full test suite**: Execute complete test suite to catch any regressions
 - **Document test strategy**: Explain how reuse affects testing approach
+- **Document regression fixes**: Record any issues found and how they were resolved
 
 ## Quality Assurance
 
@@ -173,10 +175,11 @@ When testing component reuse:
 - **Security considerations**: Ensure reuse doesn't introduce security issues
 
 ### Testing Requirements
-- **Regression testing**: Verify existing functionality isn't broken
+- **Regression testing**: Verify existing functionality isn't broken by running full test suite
 - **Integration testing**: Test new functionality with existing components
 - **Unit testing**: Test new functionality in isolation
 - **End-to-end testing**: Verify complete workflows still function
+- **Full suite execution**: Run complete test suite after each task to catch any regressions early
 
 ### Code Quality
 - **Maintain consistency**: Follow existing code patterns and conventions
@@ -212,6 +215,8 @@ When testing component reuse:
 - **Start with existing**: Begin implementation by importing and using existing components
 - **Extend incrementally**: Add new functionality step by step
 - **Test continuously**: Verify functionality after each modification
+- **Run full test suite**: Execute complete test suite after task completion to catch regressions
+- **Fix regressions immediately**: Address any test failures before proceeding
 - **Document changes**: Keep documentation up to date as you modify components
 
 ### Review Phase

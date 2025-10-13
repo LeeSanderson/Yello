@@ -27,6 +27,8 @@ Use this structure for all implementation tasks:
   - Test [specific functionality] with invalid inputs
   - Test error handling scenarios
   - Run tests to verify [functionality] works correctly
+  - **Run full test suite to catch any regressions**
+  - Fix any failing tests before proceeding
   - _Requirements: [same requirement references as implementation]_
 ```
 
@@ -68,9 +70,10 @@ Every test task must include:
 1. **Check for existing components** from previous tasks in the same feature
 2. Implement functionality (reusing existing components where possible)
 3. Write and run unit tests immediately
-4. Verify tests pass before proceeding
-5. Move to next implementation task
-6. Repeat cycle
+4. **Run full test suite** to catch any regressions
+5. Verify all tests pass before proceeding
+6. Move to next implementation task
+7. Repeat cycle
 
 ### Component Reuse Requirements
 Before implementing any new functionality, **MUST** check for and reuse existing components from previous tasks within the same feature:
@@ -110,9 +113,31 @@ For each task that reuses components:
 
 ### Continuous Verification
 - Run tests after each implementation step
-- Fix any failing tests before proceeding
+- **Run full test suite after completing each task** to catch regressions
+- Fix any failing tests before proceeding to next task
 - Maintain test suite health throughout development
 - Verify existing component integrations continue to work
+
+### Regression Testing Requirements
+**MANDATORY**: After completing each task (implementation + unit tests), run the complete test suite:
+
+#### Full Test Suite Execution
+- **Backend tests**: Run `bun test` in server directory to test all backend functionality
+- **Frontend tests**: Run `bun test` in client directory to test all frontend functionality  
+- **Integration tests**: Run all API and cross-component integration tests
+- **Shared code tests**: Run tests for shared utilities and types
+
+#### Regression Detection
+- **Identify failures**: Any test that was previously passing but now fails indicates a regression
+- **Root cause analysis**: Determine if failure is due to current task changes or existing issues
+- **Fix immediately**: Address all regressions before proceeding to next task
+- **Document fixes**: Record what caused the regression and how it was resolved
+
+#### Test Suite Health
+- **Monitor performance**: Ensure test execution time doesn't degrade significantly
+- **Check coverage**: Verify code coverage doesn't decrease with new changes
+- **Update tests**: Modify existing tests if legitimate changes require test updates
+- **Add missing tests**: Identify and add tests for any uncovered edge cases discovered
 
 ## Documentation Requirements
 
@@ -252,6 +277,7 @@ Example of component reuse:
 Before finalizing any spec, verify:
 - [ ] Every implementation task has a corresponding test task
 - [ ] Test tasks include "Run tests to verify [functionality] works correctly"
+- [ ] **Test tasks include "Run full test suite to catch any regressions"**
 - [ ] Test tasks reference the same requirements as implementation tasks
 - [ ] Integration tests are included for API endpoints
 - [ ] End-to-end tests are included for complete workflows
@@ -259,8 +285,9 @@ Before finalizing any spec, verify:
 - [ ] Test tasks are positioned immediately after implementation tasks
 - [ ] **Component reuse is documented**: Tasks identify which existing components will be reused
 - [ ] **Reuse rationale is clear**: Tasks explain why existing components are suitable for reuse
-- [ ] **Extension strategy is defined**: Tasks specify how existing components will be extended or composed
+- [ ] **Extension strategy is defined**: Tasks specify how components will be extended or composed
 - [ ] **No unnecessary duplication**: Verify no new components recreate existing functionality
+- [ ] **Regression testing is mandatory**: Every task includes full test suite execution
 
 ### Component Reuse Verification
 For each implementation task, ensure:

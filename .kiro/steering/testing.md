@@ -21,6 +21,7 @@ This document outlines testing standards and practices for the Yellow project to
 - Every implementation task MUST have a corresponding unit test task
 - Unit test tasks should immediately follow the implementation task they test
 - Test tasks must include "Run tests to verify [functionality] works correctly" as a requirement
+- **Test tasks MUST include "Run full test suite to catch any regressions" as a requirement**
 - Integration tests should be included for API endpoints and cross-component interactions
 
 ### Test Task Format
@@ -35,6 +36,8 @@ This document outlines testing standards and practices for the Yellow project to
   - Test [specific functionality] with invalid inputs
   - Test error handling scenarios
   - Run tests to verify [functionality] works correctly
+  - **Run full test suite to catch any regressions**
+  - Fix any failing tests before proceeding
   - _Requirements: [same requirement references]_
 ```
 
@@ -56,6 +59,39 @@ This document outlines testing standards and practices for the Yellow project to
 - **Location**: Tests in `shared/` directory should mirror source structure
 - **Coverage**: All shared utilities and types should have comprehensive tests
 - **Cross-platform**: Tests should work in both Node.js and browser environments
+
+## Regression Testing Requirements
+
+### Mandatory Full Test Suite Execution
+After completing each task (implementation + unit tests), **MUST** run the complete test suite to catch regressions:
+
+#### Test Suite Coverage
+- **Backend tests**: Execute `bun test` in server/ directory
+- **Frontend tests**: Execute `bun test` in client/ directory  
+- **Shared code tests**: Execute tests for shared/ utilities and types
+- **Integration tests**: Run all API and cross-component tests
+- **End-to-end tests**: Execute complete workflow tests when applicable
+
+#### Regression Detection Protocol
+1. **Baseline establishment**: Ensure all tests pass before starting new task
+2. **Post-implementation verification**: Run full suite after completing task
+3. **Failure analysis**: Identify any tests that were passing but now fail
+4. **Immediate resolution**: Fix all regressions before proceeding to next task
+5. **Documentation**: Record regression causes and fixes for future reference
+
+#### Regression Categories
+- **Breaking changes**: New code breaks existing functionality
+- **Interface changes**: Modified APIs break dependent code
+- **Data model changes**: Database or type changes affect existing code
+- **Dependency conflicts**: New dependencies conflict with existing ones
+- **Configuration issues**: Environment or build changes affect tests
+
+#### Resolution Requirements
+- **Root cause identification**: Determine why regression occurred
+- **Minimal fix approach**: Make smallest change necessary to resolve issue
+- **Test updates**: Update tests only if legitimate changes require it
+- **Verification**: Ensure fix doesn't introduce new regressions
+- **Documentation**: Document what caused regression and how it was fixed
 
 ## Test Categories and Requirements
 
@@ -190,9 +226,21 @@ When creating implementation plans for specs:
 
 1. **Every implementation task MUST be followed by a unit test task**
 2. **Test tasks must include verification that tests pass**
-3. **Integration tests must be included for API endpoints**
-4. **End-to-end tests must be included for complete workflows**
-5. **Test tasks must reference the same requirements as implementation tasks**
-6. **Test execution must be verified before considering a task complete**
+3. **Test tasks MUST include full test suite execution to catch regressions**
+4. **Integration tests must be included for API endpoints**
+5. **End-to-end tests must be included for complete workflows**
+6. **Test tasks must reference the same requirements as implementation tasks**
+7. **All regressions must be fixed before considering a task complete**
+8. **Test execution must be verified before moving to the next implementation step**
 
-This ensures that all code is properly tested and verified to work correctly before moving to the next implementation step.
+### Regression Prevention Workflow
+For each task completion:
+1. Run unit tests for new functionality
+2. **Run complete test suite across all components**
+3. Identify and analyze any test failures
+4. Fix regressions immediately
+5. Re-run full test suite to verify fixes
+6. Document any issues and resolutions
+7. Proceed to next task only after all tests pass
+
+This ensures that all code is properly tested, verified to work correctly, and doesn't break existing functionality before moving to the next implementation step.
