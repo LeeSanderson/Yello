@@ -6,15 +6,15 @@
   - Create password hashing utilities using bcrypt
   - _Requirements: 3.4, 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 2. Create authentication service layer
-  - [ ] 2.1 Implement user registration service
+- [x] 2. Create authentication service layer
+  - [x] 2.1 Implement user registration service
     - Write user registration logic with email uniqueness validation
     - Implement password hashing before database storage
     - Create user creation with proper error handling
     - _Requirements: 1.1, 1.2, 1.5, 4.1, 4.2_
     - _Reuses: JWT utilities (task 1), password hashing utilities (task 1)_
 
-  - [ ] 2.2 Write unit tests for user registration service
+  - [x] 2.2 Write unit tests for user registration service
     - Create unit tests for registration service validation
     - Test email uniqueness validation scenarios
     - Test password hashing integration
@@ -24,14 +24,14 @@
     - Fix any failing tests before proceeding
     - _Requirements: 1.1, 1.2, 1.5, 4.1, 4.2_
 
-  - [ ] 2.3 Implement user login service
+  - [x] 2.3 Implement user login service
     - Write login authentication logic with credential validation
     - Implement secure password comparison using bcrypt
     - Generate JWT tokens upon successful authentication
     - _Requirements: 2.1, 2.4, 4.3, 4.4_
     - _Reuses: JWT utilities (task 1), password hashing utilities (task 1), UserService (task 2.1)_
 
-  - [ ] 2.4 Write unit tests for user login service
+  - [x] 2.4 Write unit tests for user login service
     - Write unit tests for login service authentication
     - Test password comparison functionality
     - Test JWT token generation
