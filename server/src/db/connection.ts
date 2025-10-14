@@ -1,22 +1,34 @@
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { sql } from 'drizzle-orm';
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://yellow_user:yellow_password@localhost:5432/yellow_dev';
+export interface DatabaseConfig {
+  connectionString?: string;
+  maxConnections?: number;
+  idleTimeoutMs?: number;
+  connectionTimeoutMs?: number;
+}
 
-const pool = new Pool({
-  connectionString,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+export type DatabaseConnection = ReturnType<typeof createDatabaseConnection>;
 
-export const db = drizzle(pool);
+export function createDatabaseConnection(config?: DatabaseConfig) {
+  const connectionString = config?.connectionString ||
+    process.env.DATABASE_URL ||
+    'postgresql://yellow_user:yellow_password@localhost:5432/yellow_dev';
 
-export async function testConnection() {
+  const pool = new Pool({
+    connectionString,
+    max: config?.maxConnections || 20,
+    idleTimeoutMillis: config?.idleTimeoutMs || 30000,
+    connectionTimeoutMillis: config?.connectionTimeoutMs || 2000,
+  });
+
+  return drizzle(pool);
+}
+
+export async function testConnection(db: DatabaseConnection) {
   try {
-    const client = await pool.connect();
-    const result = await client.query('SELECT NOW()');
-    client.release();
+    const result = await db.execute(sql`SELECT NOW()`);
     console.log('✅ Database connected successfully at:', result.rows[0].now);
     return true;
   } catch (error) {
@@ -25,4 +37,7 @@ export async function testConnection() {
   }
 }
 
-export { pool };
+// Create default database connection for application startup
+export function createDefaultDatabaseConnection() {
+  return createDatabaseConnection();
+}

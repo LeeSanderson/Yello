@@ -1,9 +1,14 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { testConnection, db } from './db/connection';
-import { users, workspaces, projects, tasks } from './db/schema';
-import { eq } from 'drizzle-orm';
+import { testConnection, type DatabaseConnection } from './db/connection';
+import { setupContainer } from './container/setup';
+import type { UserRepository } from './repositories/UserRepository';
+import type { WorkspaceRepository } from './repositories/WorkspaceRepository';
+import type { ProjectRepository } from './repositories/ProjectRepository';
+import type { TaskRepository } from './repositories/TaskRepository';
 
+// Setup dependency injection container
+const container = setupContainer();
 const app = new Hono();
 
 // Middleware
@@ -14,7 +19,8 @@ app.use('*', cors({
 
 // Routes
 app.get('/api/health', async (c) => {
-  const dbConnected = await testConnection();
+  const db = container.get<DatabaseConnection>('database');
+  const dbConnected = await testConnection(db);
   return c.json({ 
     status: dbConnected ? 'ok' : 'error', 
     service: 'yellow-api',
@@ -26,7 +32,8 @@ app.get('/api/health', async (c) => {
 // Database test routes
 app.get('/api/users', async (c) => {
   try {
-    const allUsers = await db.select().from(users);
+    const userRepository = container.get<UserRepository>('userRepository');
+    const allUsers = await userRepository.findAll();
     return c.json({ data: allUsers });
   } catch (error) {
     console.error('Database error:', error);
@@ -36,7 +43,8 @@ app.get('/api/users', async (c) => {
 
 app.get('/api/workspaces', async (c) => {
   try {
-    const allWorkspaces = await db.select().from(workspaces);
+    const workspaceRepository = container.get<WorkspaceRepository>('workspaceRepository');
+    const allWorkspaces = await workspaceRepository.findAll();
     return c.json({ data: allWorkspaces });
   } catch (error) {
     console.error('Database error:', error);
@@ -46,7 +54,8 @@ app.get('/api/workspaces', async (c) => {
 
 app.get('/api/projects', async (c) => {
   try {
-    const allProjects = await db.select().from(projects);
+    const projectRepository = container.get<ProjectRepository>('projectRepository');
+    const allProjects = await projectRepository.findAll();
     return c.json({ data: allProjects });
   } catch (error) {
     console.error('Database error:', error);
@@ -56,7 +65,8 @@ app.get('/api/projects', async (c) => {
 
 app.get('/api/tasks', async (c) => {
   try {
-    const allTasks = await db.select().from(tasks);
+    const taskRepository = container.get<TaskRepository>('taskRepository');
+    const allTasks = await taskRepository.findAll();
     return c.json({ data: allTasks });
   } catch (error) {
     console.error('Database error:', error);
@@ -72,7 +82,8 @@ app.notFound((c) => {
 const port = process.env.PORT || 3000;
 
 // Initialize database connection on startup
-testConnection().then((connected) => {
+const db = container.get<DatabaseConnection>('database');
+testConnection(db).then((connected) => {
   if (connected) {
     console.log(`🚀 Server running on http://localhost:${port}`);
   } else {
