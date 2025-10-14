@@ -102,6 +102,8 @@ bun test             # Run frontend tests
 - Implement barrel exports (index.ts) for clean imports
 - Separate concerns: controllers → services → repositories
 - Keep business logic in services, UI logic in components
+- **Follow dependency injection patterns**: See dependency-injection.md for comprehensive guidelines
+- Avoid global state and singletons - inject all dependencies through constructors
 
 ### TypeScript Best Practices
 - Enable strict mode in all tsconfig.json files
@@ -120,6 +122,8 @@ bun test             # Run frontend tests
 - Implement proper CORS for cross-origin requests
 - Validate inputs at API boundaries
 - Return consistent error formats
+- **Use dependency injection**: Inject database connections and services into controllers and repositories
+- Create factory functions for database connections instead of global exports
 
 ### Frontend Development
 - Use React functional components with hooks
@@ -139,6 +143,8 @@ bun test             # Run frontend tests
 - **Test Execution**: Tests must pass before considering tasks complete
 - **Test-Driven Development**: Write tests alongside or before implementation
 - **Integration Tests**: Required for API endpoints and cross-component interactions
+- **Mock Dependencies**: Use dependency injection to easily mock services and repositories in tests
+- **Test Database**: Create separate test database connections using factory functions
 
 ### Security
 - Validate all user inputs
