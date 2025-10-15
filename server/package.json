@@ -27,7 +27,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pg": "^8.15.5",
     "drizzle-kit": "^0.31.5",
-    "@electric-sql/pglite": "^0.3.11",    
+    "@electric-sql/pglite": "^0.3.11",
     "typescript": "^5.9.3"
   }
 }

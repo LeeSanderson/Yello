@@ -41,14 +41,14 @@
     - Fix any failing tests before proceeding
     - _Requirements: 2.1, 2.4, 4.3, 4.4_
 
-- [ ] 3. Create input validation schemas
-  - [ ] 3.1 Implement registration validation schema
+- [x] 3. Create input validation schemas
+  - [x] 3.1 Implement registration validation schema
     - Create Zod schema for email format validation
     - Implement password length and strength validation
     - Add name field validation for user registration
     - _Requirements: 1.2, 1.3, 1.4_
 
-  - [ ] 3.2 Write unit tests for registration validation schema
+  - [x] 3.2 Write unit tests for registration validation schema
     - Test email format validation with valid and invalid emails
     - Test password length and strength requirements
     - Test name field validation
