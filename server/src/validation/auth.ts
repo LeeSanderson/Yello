@@ -4,10 +4,12 @@ import { z } from 'zod';
  * Email validation schema
  * Validates email format using Zod's built-in email validation
  */
+// export const emailSchema = z
+//     .string()
+//     .min(1, 'Email is required')
+//     .email({ message: 'Please enter a valid email address' });
 export const emailSchema = z
-    .string()
-    .min(1, 'Email is required')
-    .email({ message: 'Please enter a valid email address' });
+    .email('Please enter a valid email address');
 
 /**
  * Password validation schema

@@ -5,8 +5,6 @@ import {
   nameSchema, 
   registerSchema,
   loginSchema,
-  type RegisterData,
-  type LoginData
 } from './auth';
 
 describe('Email Validation Schema', () => {
@@ -51,7 +49,7 @@ describe('Email Validation Schema', () => {
     const result = emailSchema.safeParse('');
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe('Email is required');
+      expect(result.error.issues[0].message).toBe('Please enter a valid email address');
     }
   });
 });
