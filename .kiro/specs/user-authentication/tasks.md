@@ -57,13 +57,13 @@
     - Fix any failing tests before proceeding
     - _Requirements: 1.2, 1.3, 1.4_
 
-  - [ ] 3.3 Implement login validation schema
+  - [x] 3.3 Implement login validation schema
     - Create Zod schema for login request validation
     - Validate email and password field presence
     - _Requirements: 2.2, 2.3_
     - _Reuses: Email validation schema (task 3.1)_
 
-  - [ ] 3.4 Write unit tests for login validation schema
+  - [x] 3.4 Write unit tests for login validation schema
     - Test login request validation with valid and invalid inputs
     - Test email and password field presence validation
     - Run tests to verify login validation schema works correctly
