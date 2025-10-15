@@ -77,8 +77,6 @@
 
 
   - [x] 4.1 Implement JWT authentication middleware
-
-
     - Write middleware to extract and validate JWT tokens from requests
     - Attach user context to authenticated requests
     - Handle token expiration and invalid token scenarios
@@ -86,8 +84,8 @@
     - _Reuses: JWT utilities (task 1), UserService (task 2.1)_
 
 
+  - [x] 4.2 Write unit tests for JWT authentication middleware
 
-  - [ ] 4.2 Write unit tests for JWT authentication middleware
     - Test token extraction from Authorization header
     - Test user context attachment for valid tokens
     - Test error handling for expired and invalid tokens
@@ -95,19 +93,15 @@
     - Run tests to verify authentication middleware works correctly
     - **Run full test suite to catch any regressions**
     - Fix any failing tests before proceeding
-
-
     - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.2, 5.3, 5.4_
 
-  - [ ] 4.3 Create optional authentication middleware
+  - [x] 4.3 Create optional authentication middleware
     - Implement middleware that allows both authenticated and unauthenticated access
-
-
     - Attach user context when token is present and valid
     - _Requirements: 5.5_
     - _Reuses: JWT authentication middleware (task 4.1)_
 
-  - [ ] 4.4 Write unit tests for optional authentication middleware
+  - [x] 4.4 Write unit tests for optional authentication middleware
     - Test middleware behavior with valid tokens
     - Test middleware behavior without tokens
     - Test middleware behavior with invalid tokens
