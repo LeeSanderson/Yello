@@ -1,29 +1,15 @@
 import type { Context, Next } from 'hono';
-import { JWTUtils } from '../utils/jwt';
-import type { UserResponse } from '../services/UserService';
-import type { IUserRepository } from '../repositories/UserRepository';
-
-export interface AuthenticatedContext extends Context {
-  get(key: 'user'): UserResponse;
-  set(key: 'user', value: UserResponse): void;
-}
-
-export interface AuthMiddlewareOptions {
-  userRepository: IUserRepository;
-}
+import { JWTPayload } from '../utils/jwt';
+import { IAuthHelper } from './AuthHelper';
 
 /**
  * JWT Authentication Middleware
  * Validates JWT tokens and attaches user context to authenticated requests
  */
-export function createAuthMiddleware(options: AuthMiddlewareOptions) {
-  const { userRepository } = options;
-
+export function createAuthMiddleware(helper: IAuthHelper) {
   return async (c: Context, next: Next) => {
     try {
-      // Extract token from Authorization header
-      const authorization = c.req.header('Authorization');
-      const token = JWTUtils.extractTokenFromHeader(authorization);
+      const token = helper.getTokenFromContext(c);
 
       if (!token) {
         return c.json({ 
@@ -33,9 +19,9 @@ export function createAuthMiddleware(options: AuthMiddlewareOptions) {
       }
 
       // Verify and decode token
-      let decoded;
+      let decoded: JWTPayload;
       try {
-        decoded = JWTUtils.verifyToken(token);
+        decoded = helper.verifyToken(token);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Token verification failed';
         return c.json({ 
@@ -45,22 +31,13 @@ export function createAuthMiddleware(options: AuthMiddlewareOptions) {
       }
 
       // Get user from database to ensure user still exists and get current data
-      const user = await userRepository.findById(decoded.userId);
-      if (!user) {
+      const userResponse = await helper.findUserByToken(decoded);
+      if (!userResponse) {
         return c.json({ 
           error: 'Unauthorized', 
           message: 'User not found' 
         }, 401);
       }
-
-      // Attach user context to request
-      const userResponse: UserResponse = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      };
 
       c.set('user', userResponse);
       await next();
@@ -79,14 +56,10 @@ export function createAuthMiddleware(options: AuthMiddlewareOptions) {
  * Allows both authenticated and unauthenticated access
  * Attaches user context when token is present and valid
  */
-export function createOptionalAuthMiddleware(options: AuthMiddlewareOptions) {
-  const { userRepository } = options;
-
+export function createOptionalAuthMiddleware(helper: IAuthHelper) {
   return async (c: Context, next: Next) => {
     try {
-      // Extract token from Authorization header
-      const authorization = c.req.header('Authorization');
-      const token = JWTUtils.extractTokenFromHeader(authorization);
+      const token = helper.getTokenFromContext(c);
 
       // If no token, continue without authentication
       if (!token) {
@@ -95,38 +68,34 @@ export function createOptionalAuthMiddleware(options: AuthMiddlewareOptions) {
       }
 
       // Try to verify and decode token
-      let decoded;
+      let decoded: JWTPayload;
       try {
-        decoded = JWTUtils.verifyToken(token);
+        decoded = helper.verifyToken(token);
       } catch (error) {
         // If token is invalid, continue without authentication
         await next();
         return;
       }
 
-      // Get user from database
-      const user = await userRepository.findById(decoded.userId);
-      if (!user) {
-        // If user not found, continue without authentication
-        await next();
-        return;
+      // Get user from database to ensure user still exists and get current data
+      const userResponse = await helper.findUserByToken(decoded);
+      if (!userResponse) {
+        // If user not found, return error
+        return c.json({ 
+          error: 'Unauthorized', 
+          message: 'User not found' 
+        }, 401);
       }
 
-      // Attach user context to request
-      const userResponse: UserResponse = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      };
 
       c.set('user', userResponse);
       await next();
     } catch (error) {
       console.error('Optional authentication middleware error:', error);
-      // On error, continue without authentication
-      await next();
-    }
+      return c.json({ 
+        error: 'Internal Server Error', 
+        message: 'Authentication failed' 
+      }, 500);
+   }
   };
 }

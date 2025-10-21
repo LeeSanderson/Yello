@@ -1,7 +1,7 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { StringValue } from 'ms';
 
-interface JWTPayload {
+export interface JWTPayload {
     userId: string;
     email: string;
 }
