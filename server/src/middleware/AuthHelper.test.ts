@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeEach, spyOn } from 'bun:test';
+import { describe, it, expect, mock, beforeEach, afterEach, spyOn } from 'bun:test';
 import { AuthHelper, IAuthHelper } from './AuthHelper';
 import type { IUserRepository, User } from '../repositories/UserRepository';
 import type { UserResponse } from '../services';
@@ -52,6 +52,11 @@ describe('AuthHelper', () => {
 
         // Create AuthHelper instance with injected dependencies
         authHelper = new AuthHelper(mockUserRepository);
+    });
+
+    afterEach(() => {
+        // Restore all mocks to prevent interference between tests
+        mock.restore();
     });
 
     describe('getTokenFromContext', () => {
