@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { testConnection, type DatabaseConnection } from './db/connection';
 import { setupContainer } from './container/setup';
+import { createAuthRoutes } from './routes/auth';
 import type { UserRepository } from './repositories/UserRepository';
 import type { WorkspaceRepository } from './repositories/WorkspaceRepository';
 import type { ProjectRepository } from './repositories/ProjectRepository';
@@ -28,6 +29,9 @@ app.get('/api/health', async (c) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Authentication routes
+app.route('/api/auth', createAuthRoutes(container));
 
 // Database test routes
 app.get('/api/users', async (c) => {

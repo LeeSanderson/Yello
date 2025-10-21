@@ -4,6 +4,9 @@ import { UserRepository } from '../repositories/UserRepository';
 import { WorkspaceRepository } from '../repositories/WorkspaceRepository';
 import { ProjectRepository } from '../repositories/ProjectRepository';
 import { TaskRepository } from '../repositories/TaskRepository';
+import { UserService } from '../services/UserService';
+import { AuthHelper } from '../middleware/AuthHelper';
+import { createAuthMiddleware } from '../middleware/auth';
 
 export function setupContainer(): Container {
   const container = new Container();
@@ -26,6 +29,20 @@ export function setupContainer(): Container {
   
   container.register<TaskRepository>('taskRepository', () => 
     new TaskRepository(container.get<DatabaseConnection>('database'))
+  );
+
+  // Register services
+  container.register<UserService>('userService', () => 
+    new UserService(container.get<UserRepository>('userRepository'))
+  );
+
+  // Register authentication helpers and middleware
+  container.register<AuthHelper>('authHelper', () => 
+    new AuthHelper(container.get<UserRepository>('userRepository'))
+  );
+
+  container.register('authMiddleware', () => 
+    createAuthMiddleware(container.get<AuthHelper>('authHelper'))
   );
 
   return container;

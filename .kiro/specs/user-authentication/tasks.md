@@ -110,15 +110,16 @@
     - Fix any failing tests before proceeding
     - _Requirements: 5.5_
 
-- [ ] 5. Implement authentication API routes
-  - [ ] 5.1 Create user registration endpoint
+- [x] 5. Implement authentication API routes
+
+  - [x] 5.1 Create user registration endpoint
     - Implement POST /api/auth/register route handler
     - Integrate input validation and registration service
     - Return appropriate success and error responses
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
     - _Reuses: Registration validation schema (task 3.1), UserService (task 2.1)_
 
-  - [ ] 5.2 Write unit tests for user registration endpoint
+  - [x] 5.2 Write unit tests for user registration endpoint
     - Test registration endpoint with valid user data
     - Test registration endpoint with invalid email formats
     - Test registration endpoint with weak passwords
@@ -128,14 +129,14 @@
     - Fix any failing tests before proceeding
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-  - [ ] 5.3 Create user login endpoint
+  - [x] 5.3 Create user login endpoint
     - Implement POST /api/auth/login route handler
     - Integrate login validation and authentication service
     - Return JWT token and user information on success
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
     - _Reuses: Login validation schema (task 3.3), Login service (task 2.3)_
 
-  - [ ] 5.4 Write unit tests for user login endpoint
+  - [x] 5.4 Write unit tests for user login endpoint
     - Test login endpoint with valid credentials
     - Test login endpoint with invalid credentials
     - Test login endpoint with non-existent users
@@ -145,13 +146,13 @@
     - Fix any failing tests before proceeding
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-  - [ ] 5.5 Create user profile endpoint
+  - [x] 5.5 Create user profile endpoint
     - Implement GET /api/auth/me route with authentication middleware
     - Return current user information for authenticated requests
     - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.3_
     - _Reuses: JWT authentication middleware (task 4.1), UserService (task 2.1)_
 
-  - [ ] 5.6 Write unit tests for user profile endpoint
+  - [x] 5.6 Write unit tests for user profile endpoint
     - Test profile endpoint with valid authentication
     - Test profile endpoint without authentication
     - Test profile endpoint with expired tokens
@@ -160,12 +161,12 @@
     - Fix any failing tests before proceeding
     - _Requirements: 3.1, 3.2, 3.3, 5.1, 5.3_
 
-  - [ ] 5.7 Create logout endpoint
+  - [x] 5.7 Create logout endpoint
     - Implement POST /api/auth/logout route handler
     - Handle session invalidation (client-side token removal)
     - _Requirements: 3.4_
 
-  - [ ] 5.8 Write unit tests for logout endpoint
+  - [x] 5.8 Write unit tests for logout endpoint
     - Test logout endpoint functionality
     - Test logout endpoint response format
     - Run tests to verify logout endpoint works correctly
