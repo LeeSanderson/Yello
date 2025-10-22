@@ -30,12 +30,34 @@ export class AuthenticationError extends Error {
     super(message);
     this.name = 'AuthenticationError';
   }
+
+  static emailAlreadyExists(): AuthenticationError {
+      return new AuthenticationError(
+        'User with this email already exists',
+        'EMAIL_ALREADY_EXISTS'
+      );
+  }
+
+  static invalidCredentials(): AuthenticationError {
+      return new AuthenticationError(
+        'Invalid email or password',
+        'INVALID_CREDENTIALS'
+      );
+
+  }
 }
 
 export class ValidationError extends Error {
   constructor(message: string, public code: string) {
     super(message);
     this.name = 'ValidationError';
+  }
+
+  static invalidPassword(passwordValidationErrors: string[]): ValidationError {
+      throw new ValidationError(
+        passwordValidationErrors.join(', '),
+        'INVALID_PASSWORD'
+      );
   }
 }
 
@@ -53,19 +75,13 @@ export class UserService implements IUserService {
     // Validate password strength
     const passwordValidation = PasswordUtils.validatePasswordStrength(password);
     if (!passwordValidation.isValid) {
-      throw new ValidationError(
-        passwordValidation.errors.join(', '),
-        'INVALID_PASSWORD'
-      );
+      throw ValidationError.invalidPassword(passwordValidation.errors);
     }
 
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
-      throw new AuthenticationError(
-        'User with this email already exists',
-        'EMAIL_ALREADY_EXISTS'
-      );
+      throw AuthenticationError.emailAlreadyExists()
     }
 
     // Hash password
@@ -97,10 +113,7 @@ export class UserService implements IUserService {
     } catch (error) {
       // Handle database errors (e.g., unique constraint violations)
       if (error instanceof Error && error.message.includes('unique')) {
-        throw new AuthenticationError(
-          'User with this email already exists',
-          'EMAIL_ALREADY_EXISTS'
-        );
+        throw AuthenticationError.emailAlreadyExists()
       }
       throw new Error('Failed to create user account');
     }
@@ -112,10 +125,7 @@ export class UserService implements IUserService {
     // Find user by email
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
-      throw new AuthenticationError(
-        'Invalid email or password',
-        'INVALID_CREDENTIALS'
-      );
+      throw AuthenticationError.invalidCredentials();
     }
 
     // Compare password
@@ -127,10 +137,7 @@ export class UserService implements IUserService {
     }
 
     if (!isPasswordValid) {
-      throw new AuthenticationError(
-        'Invalid email or password',
-        'INVALID_CREDENTIALS'
-      );
+      throw AuthenticationError.invalidCredentials();
     }
 
     // Generate JWT token
