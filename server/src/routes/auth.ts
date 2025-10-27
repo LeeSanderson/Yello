@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import type { Context, MiddlewareHandler } from 'hono';
 import type { Container } from '../container/Container';
-import type { UserService } from '../services/UserService';
+import type { IUserService } from '../services/UserService';
 import { registerSchema, loginSchema } from '../validation/auth';
 import { AuthenticationError, ValidationError } from '../services/UserService';
 import type { UserResponse } from '../services/UserService';
@@ -13,7 +13,7 @@ import type { UserResponse } from '../services/UserService';
  */
 export function createAuthRoutes(container: Container): Hono {
   const app = new Hono();
-  const userService = container.get<UserService>('userService');
+  const userService = container.get<IUserService>('userService');
   const authMiddleware = container.get<MiddlewareHandler>('authMiddleware');
 
   /**
