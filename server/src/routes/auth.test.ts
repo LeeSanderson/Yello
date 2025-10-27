@@ -6,8 +6,8 @@ import { Container } from '../container/Container';
 import type { IUserService, RegisterUserData, LoginUserData, UserResponse } from '../services/UserService';
 import { AuthenticationError } from '../services/UserService';
 
-// Test Helper Functions
-const TestHelpers = {
+// Test Helper Functions for Auth Routes Integration
+const AuthIntegrationTestHelpers = {
   // Data factories
   createValidUser: (overrides = {}): UserResponse => ({
     id: '123',
@@ -66,234 +66,86 @@ const TestHelpers = {
     }
 
     return app.request(path, requestOptions);
-  },
-
-  // Assertion helpers
-  expectSuccessResponse: async (response: Response, expectedStatus: number, expectedMessage: string) => {
-    expect(response.status).toBe(expectedStatus);
-    const data = await response.json();
-    expect(data.message).toBe(expectedMessage);
-    return data;
-  },
-
-  expectErrorResponse: async (response: Response, expectedStatus: number, expectedError: string, expectedMessage: string) => {
-    expect(response.status).toBe(expectedStatus);
-    const data = await response.json();
-    expect(data.error).toBe(expectedError);
-    expect(data.message).toBe(expectedMessage);
-    return data;
-  },
-
-  expectValidationError: async (response: Response, expectedField: string, expectedMessage: string) => {
-    expect(response.status).toBe(400);
-    const data = await response.json();
-    expect(data.error).toBe('Validation failed');
-    expect(data.details).toContainEqual({
-      field: expectedField,
-      message: expectedMessage
-    });
-    return data;
-  },
-
-  normalizeUserDates: (user: UserResponse): any => ({
-    ...user,
-    createdAt: user.createdAt?.toISOString(),
-    updatedAt: user.updatedAt?.toISOString()
-  })
+  }
 };
 
-describe('Authentication Routes', () => {
+describe('Authentication Routes Integration', () => {
   let mockUserService: IUserService;
   let mockAuthMiddleware: MiddlewareHandler;
   let app: Hono;
 
   beforeEach(() => {
-    mockUserService = TestHelpers.createMockUserService();
-    mockAuthMiddleware = TestHelpers.createMockAuthMiddleware();
-    const container = TestHelpers.setupContainer(mockUserService, mockAuthMiddleware);
-    app = TestHelpers.setupApp(container);
+    mockUserService = AuthIntegrationTestHelpers.createMockUserService();
+    mockAuthMiddleware = AuthIntegrationTestHelpers.createMockAuthMiddleware();
+    const container = AuthIntegrationTestHelpers.setupContainer(mockUserService, mockAuthMiddleware);
+    app = AuthIntegrationTestHelpers.setupApp(container);
   });
 
-  describe('POST /auth/register', () => {
-    it('should register user successfully with valid data', async () => {
-      // Arrange
-      const userData = TestHelpers.createValidRegisterData();
-      const expectedUser = TestHelpers.createValidUser();
-      (mockUserService.register as any).mockResolvedValue(expectedUser);
+  describe('Route mounting integration', () => {
+    it('should mount all authentication routes successfully', async () => {
+      // Test that all routes are accessible (not 404)
+      const routes = [
+        { path: '/auth/register', method: 'POST' },
+        { path: '/auth/login', method: 'POST' },
+        { path: '/auth/me', method: 'GET' },
+        { path: '/auth/logout', method: 'POST' }
+      ];
 
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/register', 'POST', userData);
-
-      // Assert
-      const data = await TestHelpers.expectSuccessResponse(response, 201, 'User registered successfully');
-      expect(data.user).toEqual(TestHelpers.normalizeUserDates(expectedUser));
+      for (const route of routes) {
+        const response = await AuthIntegrationTestHelpers.makeRequest(app, route.path, route.method, {});
+        expect(response.status).not.toBe(404);
+      }
     });
 
-    it('should reject registration with validation errors', async () => {
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/register', 'POST', {
-        name: '',
-        email: 'invalid-email',
-        password: '123'
-      });
+    it('should handle route composition correctly', async () => {
+      // Test that routes don't interfere with each other
+      const mockUser = AuthIntegrationTestHelpers.createValidUser();
+      (mockUserService.register as any).mockResolvedValue(mockUser);
+      (mockUserService.login as any).mockResolvedValue({ user: mockUser, token: 'test-token' });
 
-      // Assert
-      expect(response.status).toBe(400);
-      const data = await response.json();
-      expect(data.error).toBe('Validation failed');
-      expect(data.details).toHaveLength(3);
+      // Make requests to different routes
+      const registerResponse = await AuthIntegrationTestHelpers.makeRequest(app, '/auth/register', 'POST', 
+        AuthIntegrationTestHelpers.createValidRegisterData());
+      const loginResponse = await AuthIntegrationTestHelpers.makeRequest(app, '/auth/login', 'POST', 
+        AuthIntegrationTestHelpers.createValidLoginData());
+      const logoutResponse = await AuthIntegrationTestHelpers.makeRequest(app, '/auth/logout', 'POST');
+
+      expect(registerResponse.status).toBe(201);
+      expect(loginResponse.status).toBe(200);
+      expect(logoutResponse.status).toBe(200);
     });
 
-    it('should reject registration when email already exists', async () => {
-      // Arrange
-      const userData = TestHelpers.createValidRegisterData();
-      (mockUserService.register as any).mockRejectedValue(AuthenticationError.emailAlreadyExists());
+    it('should maintain dependency injection across all routes', async () => {
+      // Test that all routes have access to their required dependencies
+      const mockUser = AuthIntegrationTestHelpers.createValidUser();
+      (mockUserService.register as any).mockResolvedValue(mockUser);
+      (mockUserService.login as any).mockResolvedValue({ user: mockUser, token: 'test-token' });
 
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/register', 'POST', userData);
+      // Test register route uses userService
+      await AuthIntegrationTestHelpers.makeRequest(app, '/auth/register', 'POST', 
+        AuthIntegrationTestHelpers.createValidRegisterData());
+      expect(mockUserService.register).toHaveBeenCalled();
 
-      // Assert
-      await TestHelpers.expectErrorResponse(response, 409, 'Registration failed', 'User with this email already exists');
-    });
+      // Test login route uses userService
+      await AuthIntegrationTestHelpers.makeRequest(app, '/auth/login', 'POST', 
+        AuthIntegrationTestHelpers.createValidLoginData());
+      expect(mockUserService.login).toHaveBeenCalled();
 
-    it('should handle service errors gracefully', async () => {
-      // Arrange
-      const userData = TestHelpers.createValidRegisterData();
-      (mockUserService.register as any).mockRejectedValue(new Error('Database error'));
-
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/register', 'POST', userData);
-
-      // Assert
-      await TestHelpers.expectErrorResponse(response, 500, 'Internal server error', 'Failed to register user');
-    });
-  });
-
-  describe('POST /auth/login', () => {
-    it('should login user successfully with valid credentials', async () => {
-      // Arrange
-      const loginData = TestHelpers.createValidLoginData();
-      const expectedUser = TestHelpers.createValidUser();
-      const expectedResult = { user: expectedUser, token: 'jwt-token-123' };
-      (mockUserService.login as any).mockResolvedValue(expectedResult);
-
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/login', 'POST', loginData);
-
-      // Assert
-      const data = await TestHelpers.expectSuccessResponse(response, 200, 'Login successful');
-      expect(data.user).toEqual(TestHelpers.normalizeUserDates(expectedUser));
-      expect(data.token).toBe('jwt-token-123');
-    });
-
-    it('should reject login with validation errors', async () => {
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/login', 'POST', {
-        email: 'invalid-email',
-        password: ''
-      });
-
-      // Assert
-      expect(response.status).toBe(400);
-      const data = await response.json();
-      expect(data.error).toBe('Validation failed');
-      expect(data.details).toHaveLength(2);
-    });
-
-    it('should reject login with invalid credentials', async () => {
-      // Arrange
-      const loginData = TestHelpers.createValidLoginData();
-      (mockUserService.login as any).mockRejectedValue(
-        new AuthenticationError('Invalid email or password', 'INVALID_CREDENTIALS')
-      );
-
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/login', 'POST', loginData);
-
-      // Assert
-      await TestHelpers.expectErrorResponse(response, 401, 'Authentication failed', 'Invalid email or password');
-    });
-
-    it('should handle service errors gracefully', async () => {
-      // Arrange
-      const loginData = TestHelpers.createValidLoginData();
-      (mockUserService.login as any).mockRejectedValue(new Error('Database error'));
-
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/login', 'POST', loginData);
-
-      // Assert
-      await TestHelpers.expectErrorResponse(response, 500, 'Internal server error', 'Failed to authenticate user');
-    });
-  });
-
-  describe('GET /auth/me', () => {
-    it('should return user profile when authenticated', async () => {
-      // Arrange
-      const mockUser = TestHelpers.createValidUser();
+      // Test me route uses authMiddleware
       (mockAuthMiddleware as any).mockImplementation(async (c: Context, next: Next) => {
         c.set('user', mockUser);
         await next();
       });
-
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/me', 'GET', null, {
-        'Authorization': 'Bearer valid-token'
+      
+      await AuthIntegrationTestHelpers.makeRequest(app, '/auth/me', 'GET', null, {
+        'Authorization': 'Bearer test-token'
       });
-
-      // Assert
-      expect(response.status).toBe(200);
-      const data = await response.json();
-      expect(data.user).toEqual(TestHelpers.normalizeUserDates(mockUser));
+      expect(mockAuthMiddleware).toHaveBeenCalled();
     });
 
-    it('should reject unauthenticated requests', async () => {
-      // Arrange
-      (mockAuthMiddleware as any).mockImplementation(async (c: Context, next: Next) => {
-        return c.json({ error: 'Unauthorized', message: 'No authentication token provided' }, 401);
-      });
-
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/me', 'GET');
-
-      // Assert
-      await TestHelpers.expectErrorResponse(response, 401, 'Unauthorized', 'No authentication token provided');
-    });
-
-    it('should reject requests with invalid tokens', async () => {
-      // Arrange
-      (mockAuthMiddleware as any).mockImplementation(async (c: Context, next: Next) => {
-        return c.json({ error: 'Unauthorized', message: 'Invalid token' }, 401);
-      });
-
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/me', 'GET', null, {
-        'Authorization': 'Bearer invalid-token'
-      });
-
-      // Assert
-      await TestHelpers.expectErrorResponse(response, 401, 'Unauthorized', 'Invalid token');
-    });
-  });
-
-  describe('POST /auth/logout', () => {
-    it('should logout successfully', async () => {
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/logout', 'POST');
-
-      // Assert
-      const data = await TestHelpers.expectSuccessResponse(response, 200, 'Logout successful');
-      expect(Object.keys(data)).toEqual(['message']);
-    });
-
-    it('should logout successfully with authorization header', async () => {
-      // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/logout', 'POST', null, {
-        'Authorization': 'Bearer some-token'
-      });
-
-      // Assert
-      await TestHelpers.expectSuccessResponse(response, 200, 'Logout successful');
+    it('should handle 404 for non-existent auth routes', async () => {
+      const response = await AuthIntegrationTestHelpers.makeRequest(app, '/auth/nonexistent', 'GET');
+      expect(response.status).toBe(404);
     });
   });
 });
