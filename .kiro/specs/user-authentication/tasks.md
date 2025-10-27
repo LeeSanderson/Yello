@@ -182,8 +182,10 @@
     - _Reuses: All authentication endpoints (tasks 5.1, 5.3, 5.5, 5.7)_
 
   - [ ] 6.2 Write integration tests for route registration
-    - Test that authentication routes are properly mounted
-    - Test route ordering and middleware application
+    - Test successful route mounting and accessibility
+    - Test route registration failure scenarios
+    - Create test helpers for route setup and common assertions
+    - Focus tests on route behavior, not mock interactions
     - Run tests to verify route integration works correctly
     - **Run full test suite to catch any regressions**
     - Fix any failing tests before proceeding
@@ -196,9 +198,10 @@
     - _Reuses: JWT authentication middleware (task 4.1), Optional authentication middleware (task 4.3)_
 
   - [ ] 6.4 Write integration tests for protected routes
-    - Test protected route access with valid authentication
-    - Test protected route access without authentication
-    - Test protected route access with expired tokens
+    - Test successful protected route access with valid authentication
+    - Test protected route access denial scenarios (no auth, expired tokens)
+    - Create test helpers for authentication setup and route testing
+    - Focus tests on route protection behavior, not middleware implementation details
     - Run tests to verify protected routes work correctly
     - **Run full test suite to catch any regressions**
     - Fix any failing tests before proceeding
@@ -206,9 +209,10 @@
 
 - [ ] 7. Create comprehensive integration tests for authentication flow
   - [ ] 7.1 Write end-to-end authentication flow tests
-    - Test complete registration → login → protected access flow
-    - Test authentication error scenarios and edge cases
-    - Test token expiration and refresh scenarios
+    - Test successful complete authentication flow (registration → login → protected access)
+    - Test authentication flow failure scenarios and error handling
+    - Create test helpers for flow setup, user creation, and authentication state
+    - Focus tests on end-to-end system behavior, not individual component interactions
     - Run tests to verify complete authentication system works correctly
     - **Run full test suite to catch any regressions**
     - Fix any failing tests before proceeding
