@@ -1,11 +1,11 @@
 import { Container } from './Container';
 import { createDefaultDatabaseConnection, type DatabaseConnection } from '../db/connection';
-import { UserRepository } from '../repositories/UserRepository';
+import { IUserRepository, UserRepository } from '../repositories/UserRepository';
 import { WorkspaceRepository } from '../repositories/WorkspaceRepository';
 import { ProjectRepository } from '../repositories/ProjectRepository';
 import { TaskRepository } from '../repositories/TaskRepository';
-import { UserService } from '../services/UserService';
-import { AuthHelper } from '../middleware/AuthHelper';
+import { IUserService, UserService } from '../services/UserService';
+import { AuthHelper, IAuthHelper } from '../middleware/AuthHelper';
 import { createAuthMiddleware } from '../middleware/auth';
 
 export function setupContainer(): Container {
@@ -32,17 +32,17 @@ export function setupContainer(): Container {
   );
 
   // Register services
-  container.register<UserService>('userService', () => 
-    new UserService(container.get<UserRepository>('userRepository'))
+  container.register<IUserService>('userService', () => 
+    new UserService(container.get<IUserRepository>('userRepository'))
   );
 
   // Register authentication helpers and middleware
-  container.register<AuthHelper>('authHelper', () => 
-    new AuthHelper(container.get<UserRepository>('userRepository'))
+  container.register<IAuthHelper>('authHelper', () => 
+    new AuthHelper(container.get<IUserRepository>('userRepository'))
   );
 
   container.register('authMiddleware', () => 
-    createAuthMiddleware(container.get<AuthHelper>('authHelper'))
+    createAuthMiddleware(container.get<IAuthHelper>('authHelper'))
   );
 
   return container;
