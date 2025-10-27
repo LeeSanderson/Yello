@@ -1,8 +1,9 @@
 import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { Hono } from 'hono';
 import type { Context, Next, MiddlewareHandler } from 'hono';
+import type { Container} from '../container/Container';
 import { setupContainer } from '../container/setup';
-import type { IUserService, UserResponse } from '../services/UserService';
+import type { UserResponse } from '../services/UserService';
 import type { UserRepository } from '../repositories/UserRepository';
 import type { WorkspaceRepository } from '../repositories/WorkspaceRepository';
 import type { ProjectRepository } from '../repositories/ProjectRepository';
@@ -30,8 +31,7 @@ const ProtectedRouteTestHelpers = {
 
     return Array.from({ length: count }, (_, i) => ({
       ...baseData[type],
-      id: `${i + 1}`,
-      name: `${baseData[type].name || baseData[type].title} ${i + 1}`
+      id: `${i + 1}`
     }));
   },
 
@@ -69,7 +69,7 @@ const ProtectedRouteTestHelpers = {
   },
 
   // Container setup helpers
-  setupTestContainer: (authMiddleware: MiddlewareHandler): any => {
+  setupTestContainer: (authMiddleware: MiddlewareHandler): Container => {
     const container = setupContainer();
     
     // Override the auth middleware with our test version
@@ -99,7 +99,7 @@ const ProtectedRouteTestHelpers = {
   },
 
   // App setup helpers
-  setupProtectedApp: (container: any): Hono => {
+  setupProtectedApp: (container: Container): Hono => {
     const app = new Hono();
     const authMiddleware = container.get<MiddlewareHandler>('authMiddleware');
 
@@ -171,7 +171,7 @@ const ProtectedRouteTestHelpers = {
   },
 
   // Assertion helpers
-  expectSuccessfulProtectedAccess: async (response: Response, expectedDataType: string) => {
+  expectSuccessfulProtectedAccess: async (response: Response) => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data).toHaveProperty('data');
@@ -213,7 +213,7 @@ describe('Protected Routes Integration Tests', () => {
     it('should allow authenticated access to /api/users', async () => {
       const response = await ProtectedRouteTestHelpers.makeAuthenticatedRequest(app, '/api/users');
       
-      const data = await ProtectedRouteTestHelpers.expectSuccessfulProtectedAccess(response, 'users');
+      const data = await ProtectedRouteTestHelpers.expectSuccessfulProtectedAccess(response);
       expect(data.data[0]).toHaveProperty('name');
       expect(data.data[0]).toHaveProperty('email');
     });
@@ -221,7 +221,7 @@ describe('Protected Routes Integration Tests', () => {
     it('should allow authenticated access to /api/workspaces', async () => {
       const response = await ProtectedRouteTestHelpers.makeAuthenticatedRequest(app, '/api/workspaces');
       
-      const data = await ProtectedRouteTestHelpers.expectSuccessfulProtectedAccess(response, 'workspaces');
+      const data = await ProtectedRouteTestHelpers.expectSuccessfulProtectedAccess(response);
       expect(data.data[0]).toHaveProperty('name');
       expect(data.data[0]).toHaveProperty('description');
     });
@@ -229,7 +229,7 @@ describe('Protected Routes Integration Tests', () => {
     it('should allow authenticated access to /api/projects', async () => {
       const response = await ProtectedRouteTestHelpers.makeAuthenticatedRequest(app, '/api/projects');
       
-      const data = await ProtectedRouteTestHelpers.expectSuccessfulProtectedAccess(response, 'projects');
+      const data = await ProtectedRouteTestHelpers.expectSuccessfulProtectedAccess(response);
       expect(data.data[0]).toHaveProperty('name');
       expect(data.data[0]).toHaveProperty('description');
     });
@@ -237,7 +237,7 @@ describe('Protected Routes Integration Tests', () => {
     it('should allow authenticated access to /api/tasks', async () => {
       const response = await ProtectedRouteTestHelpers.makeAuthenticatedRequest(app, '/api/tasks');
       
-      const data = await ProtectedRouteTestHelpers.expectSuccessfulProtectedAccess(response, 'tasks');
+      const data = await ProtectedRouteTestHelpers.expectSuccessfulProtectedAccess(response);
       expect(data.data[0]).toHaveProperty('title');
       expect(data.data[0]).toHaveProperty('status');
     });
