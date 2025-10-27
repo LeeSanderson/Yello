@@ -7,10 +7,14 @@ import type { UserRepository } from './repositories/UserRepository';
 import type { WorkspaceRepository } from './repositories/WorkspaceRepository';
 import type { ProjectRepository } from './repositories/ProjectRepository';
 import type { TaskRepository } from './repositories/TaskRepository';
+import type { MiddlewareHandler } from 'hono';
 
 // Setup dependency injection container
 const container = setupContainer();
 const app = new Hono();
+
+// Get authentication middleware from container
+const authMiddleware = container.get<MiddlewareHandler>('authMiddleware');
 
 // Middleware
 app.use('*', cors({
@@ -33,8 +37,8 @@ app.get('/api/health', async (c) => {
 // Authentication routes
 app.route('/api/auth', createAuthRoutes(container));
 
-// Database test routes
-app.get('/api/users', async (c) => {
+// Protected routes - require authentication
+app.get('/api/users', authMiddleware, async (c) => {
   try {
     const userRepository = container.get<UserRepository>('userRepository');
     const allUsers = await userRepository.findAll();
@@ -45,7 +49,7 @@ app.get('/api/users', async (c) => {
   }
 });
 
-app.get('/api/workspaces', async (c) => {
+app.get('/api/workspaces', authMiddleware, async (c) => {
   try {
     const workspaceRepository = container.get<WorkspaceRepository>('workspaceRepository');
     const allWorkspaces = await workspaceRepository.findAll();
@@ -56,7 +60,7 @@ app.get('/api/workspaces', async (c) => {
   }
 });
 
-app.get('/api/projects', async (c) => {
+app.get('/api/projects', authMiddleware, async (c) => {
   try {
     const projectRepository = container.get<ProjectRepository>('projectRepository');
     const allProjects = await projectRepository.findAll();
@@ -67,7 +71,7 @@ app.get('/api/projects', async (c) => {
   }
 });
 
-app.get('/api/tasks', async (c) => {
+app.get('/api/tasks', authMiddleware, async (c) => {
   try {
     const taskRepository = container.get<TaskRepository>('taskRepository');
     const allTasks = await taskRepository.findAll();

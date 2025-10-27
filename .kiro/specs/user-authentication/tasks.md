@@ -174,14 +174,22 @@
     - Fix any failing tests before proceeding
     - _Requirements: 3.4_
 
-- [ ] 6. Integrate authentication routes with main application
-  - [ ] 6.1 Register authentication routes in main server
+- [x] 6. Integrate authentication routes with main application
+
+
+
+
+  - [x] 6.1 Register authentication routes in main server
+
+
     - Import and mount authentication routes in the main Hono app
     - Ensure proper route ordering and middleware application
     - _Requirements: 1.1, 2.1, 3.1, 5.1_
     - _Reuses: All authentication endpoints (tasks 5.1, 5.3, 5.5, 5.7)_
 
-  - [ ] 6.2 Write integration tests for route registration
+  - [x] 6.2 Write integration tests for route registration
+
+
     - Test successful route mounting and accessibility
     - Test route registration failure scenarios
     - Create test helpers for route setup and common assertions
@@ -191,13 +199,17 @@
     - Fix any failing tests before proceeding
     - _Requirements: 1.1, 2.1, 3.1, 5.1_
 
-  - [ ] 6.3 Update existing routes with authentication middleware
+  - [x] 6.3 Update existing routes with authentication middleware
+
+
     - Apply authentication middleware to protected routes
     - Maintain backward compatibility for public routes
     - _Requirements: 5.1, 5.2, 5.3, 5.5_
     - _Reuses: JWT authentication middleware (task 4.1), Optional authentication middleware (task 4.3)_
 
-  - [ ] 6.4 Write integration tests for protected routes
+  - [x] 6.4 Write integration tests for protected routes
+
+
     - Test successful protected route access with valid authentication
     - Test protected route access denial scenarios (no auth, expired tokens)
     - Create test helpers for authentication setup and route testing

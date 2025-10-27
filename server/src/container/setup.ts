@@ -6,7 +6,7 @@ import { ProjectRepository } from '../repositories/ProjectRepository';
 import { TaskRepository } from '../repositories/TaskRepository';
 import { IUserService, UserService } from '../services/UserService';
 import { AuthHelper, IAuthHelper } from '../middleware/AuthHelper';
-import { createAuthMiddleware } from '../middleware/auth';
+import { createAuthMiddleware, createOptionalAuthMiddleware } from '../middleware/auth';
 
 export function setupContainer(): Container {
   const container = new Container();
@@ -43,6 +43,10 @@ export function setupContainer(): Container {
 
   container.register('authMiddleware', () => 
     createAuthMiddleware(container.get<IAuthHelper>('authHelper'))
+  );
+
+  container.register('optionalAuthMiddleware', () => 
+    createOptionalAuthMiddleware(container.get<IAuthHelper>('authHelper'))
   );
 
   return container;
