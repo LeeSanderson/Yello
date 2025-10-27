@@ -32,9 +32,10 @@ This document outlines testing standards and practices for the Yellow project to
   - _Requirements: [requirement references]_
 
 - [ ] X.Z Write unit tests for [functionality]
-  - Test [specific functionality] with valid inputs
-  - Test [specific functionality] with invalid inputs
-  - Test error handling scenarios
+  - Test successful [functionality] execution path
+  - Test [functionality] failure scenarios and error handling
+  - Create test helpers for common setup and assertions
+  - Focus tests on unit behavior, not mock interactions
   - Run tests to verify [functionality] works correctly
   - **Run full test suite to catch any regressions**
   - Fix any failing tests before proceeding
@@ -101,6 +102,9 @@ After completing each task (implementation + unit tests), **MUST** run the compl
 - **Scenarios**: Test happy path, edge cases, error conditions
 - **Isolation**: Mock external dependencies and database calls
 - **Performance**: Tests should run quickly (< 100ms per test)
+- **Focus**: Test the unit's behavior, not mock interactions
+- **Efficiency**: One test per logical execution path through the unit
+- **Reusability**: Extract common setup and assertions into helper functions
 
 ### Integration Tests (Required for API endpoints)
 - **Scope**: Test interactions between components, database operations, API endpoints
@@ -133,17 +137,197 @@ After completing each task (implementation + unit tests), **MUST** run the compl
 - Avoid hardcoded values that might break over time
 - Use realistic data that represents actual usage
 
+### Unit Testing Focus
+- **Test the unit, not the mocks**: Focus tests on the behavior of the unit under test, not on verifying mock interactions
+- **One test per logical branch**: Create a single test per execution path through the unit under test
+- **Avoid mock verification tests**: Don't create tests that only verify mocks were called with specific parameters
+- **Test behavior, not implementation**: Focus on what the unit does, not how it does it
+- **Minimize mock complexity**: Use simple mocks that return the data needed for the test scenario
+
+### Test Organization and Reuse
+- **Extract common setup**: Create helper functions for common test setup and data creation
+- **Reuse test utilities**: Build reusable test utilities for common assertions and mock configurations
+- **Group related tests**: Use describe blocks to group tests by functionality or scenario
+- **Share test data**: Create shared test data factories that can be reused across multiple tests
+- **Common assertions**: Extract complex assertions into helper functions for reuse
+
 ### Mocking Guidelines
-- Mock external dependencies (APIs, databases, file system)
-- Don't mock the code you're testing
-- Use type-safe mocks that match the real interfaces
-- Reset mocks between tests to avoid interference
+- **Mock external dependencies only**: Mock APIs, databases, file system, and other external services
+- **Don't mock the code you're testing**: Never mock the unit under test or its direct outputs
+- **Use type-safe mocks**: Ensure mocks match the real interfaces they're replacing
+- **Reset mocks between tests**: Clear mock state to avoid test interference
+- **Mock at the boundary**: Mock at the edges of your system, not internal components
+- **Simple mock returns**: Make mocks return simple, predictable data for test scenarios
 
 ### Error Testing
 - Test all error conditions and edge cases
 - Verify proper error messages and status codes
 - Test error handling doesn't leak sensitive information
 - Ensure graceful degradation for non-critical failures
+
+### Unit Testing Examples
+
+#### Effective Unit Test Structure
+```typescript
+// Good: Focus on unit behavior, use helpers, test one path per test
+describe('UserService', () => {
+  let userService: UserService;
+  let mockUserRepository: IUserRepository;
+
+  // Helper function for common setup
+  function createMockUser(overrides = {}) {
+    return {
+      id: '1',
+      email: 'test@example.com',
+      name: 'Test User',
+      ...overrides
+    };
+  }
+
+  // Default expected users
+  const expectedUser = createMockUser();
+
+  // Helper function for service setup
+  // Default mocks to common behaviour to reduce test setup
+  function setupUserService() {
+    mockUserRepository = {
+      findByEmail: mock(() => Promise.resolve(null)),
+      create: mock(() => Promise.resolve(expectedUser)),
+      findById: mock(() => Promise.resolve(null)),
+    };
+    userService = new UserService(mockUserRepository);
+  }
+
+  beforeEach(() => {
+    setupUserService();
+  });
+
+  describe('createUser', () => {
+    it('should create user when email is unique', async () => {
+      // Arrange
+      const userData = { email: 'new@example.com', name: 'New User' };
+      mockUserRepository.create.mockResolvedValue(expectedUser);
+
+      // Act
+      const result = await userService.createUser(userData);
+
+      // Assert
+      expect(result).toEqual(expectedUser);
+    });
+
+    it('should throw error when email already exists', async () => {
+      // Arrange
+      const userData = { email: 'existing@example.com', name: 'User' };
+      mockUserRepository.findByEmail.mockResolvedValue(existingUser);
+
+      // Act & Assert
+      await expect(userService.createUser(userData)).rejects.toThrow('Email already exists');
+    });
+  });
+});
+```
+
+#### Avoid These Anti-Patterns
+```typescript
+// Bad: Testing mock interactions instead of unit behavior
+it('should call repository with correct parameters', async () => {
+  await userService.createUser(userData);
+  expect(mockUserRepository.create).toHaveBeenCalledWith(userData); // This tests the mock, not the unit
+});
+
+// Bad: Multiple scenarios in one test
+it('should handle user creation', async () => {
+  // Testing multiple paths in one test makes it hard to understand failures
+  mockUserRepository.findByEmail.mockResolvedValue(null);
+  const result1 = await userService.createUser(validData);
+  expect(result1).toBeDefined();
+  
+  mockUserRepository.findByEmail.mockResolvedValue(existingUser);
+  await expect(userService.createUser(duplicateData)).rejects.toThrow();
+});
+
+// Bad: Duplicated setup in every test
+it('should create user', async () => {
+  const mockRepo = { findByEmail: jest.fn(), create: jest.fn() }; // Repeated setup
+  const service = new UserService(mockRepo);
+  // ... test logic
+});
+```
+
+### Test Helper Patterns
+
+#### Data Factory Functions
+```typescript
+// Create reusable data factories
+export const UserFactory = {
+  create: (overrides = {}) => ({
+    id: '1',
+    email: 'test@example.com',
+    name: 'Test User',
+    createdAt: new Date(),
+    ...overrides
+  }),
+
+  createMany: (count: number, overrides = {}) => 
+    Array.from({ length: count }, (_, i) => 
+      UserFactory.create({ id: `${i + 1}`, ...overrides })
+    ),
+
+  createLoginData: (overrides = {}) => ({
+    email: 'test@example.com',
+    password: 'password123',
+    ...overrides
+  })
+};
+```
+
+
+#### Assertion Helpers
+```typescript
+// Create reusable assertion helpers
+export const TestAssertions = {
+  expectUserMatch: (actual: User, expected: Partial<User>) => {
+    expect(actual.id).toBe(expected.id);
+    expect(actual.email).toBe(expected.email);
+    expect(actual.name).toBe(expected.name);
+    if (expected.createdAt) {
+      expect(actual.createdAt).toEqual(expected.createdAt);
+    }
+  },
+
+  expectErrorResponse: (response: any, statusCode: number, message: string) => {
+    expect(response.status).toBe(statusCode);
+    expect(response.body.error).toBe(message);
+  },
+
+  expectValidationError: (error: any, field: string) => {
+    expect(error).toBeInstanceOf(ValidationError);
+    expect(error.field).toBe(field);
+  }
+};
+```
+
+#### Test Setup Helpers
+```typescript
+// Create reusable setup helpers
+export const TestSetup = {
+  createAuthenticatedContext: (user = UserFactory.create()) => {
+    return {
+      req: { header: mock() },
+      set: mock(),
+      json: mock(),
+      get: mock(() => user)
+    };
+  },
+
+  createServiceWithMocks: () => {
+    const mockUserRepo = MockRepositoryFactory.createUserRepository();
+    const mockProjectRepo = MockRepositoryFactory.createProjectRepository();
+    const service = new UserService(mockUserRepo);
+    return { service, mockUserRepo, mockProjectRepo };
+  }
+};
+```
 
 ## Test Execution and CI/CD
 
@@ -244,3 +428,29 @@ For each task completion:
 7. Proceed to next task only after all tests pass
 
 This ensures that all code is properly tested, verified to work correctly, and doesn't break existing functionality before moving to the next implementation step.
+
+## Unit Testing Principles Summary
+
+### Key Guidelines for Effective Unit Tests
+1. **Test the unit, not the mocks**: Focus on verifying the behavior of the code under test, not the interactions with mocked dependencies
+2. **One test per execution path**: Create separate tests for each logical branch through the unit under test
+3. **Extract common code**: Use helper functions for setup, data creation, and complex assertions to avoid duplication
+4. **Mock at boundaries**: Only mock external dependencies (databases, APIs, file systems), never mock the unit being tested
+5. **Simple mock returns**: Make mocks return predictable data needed for the test scenario, avoid complex mock logic
+6. **Focus on behavior**: Test what the unit does (outputs, side effects, exceptions) rather than how it does it
+7. **Reusable test utilities**: Create factories and helpers that can be shared across multiple test files
+8. **Clear test structure**: Use consistent arrange-act-assert patterns with descriptive test names
+
+### What NOT to Test
+- Mock function calls and parameters (unless they represent critical business logic)
+- Implementation details that could change without affecting behavior
+- Framework or library functionality (assume they work correctly)
+- Complex mock interactions that don't represent real system behavior
+
+### Test Quality Indicators
+- Tests are easy to understand and maintain
+- Tests fail for the right reasons (when unit behavior changes)
+- Tests pass consistently and run quickly
+- Test setup is minimal and reusable
+- Tests focus on business logic and edge cases
+- Common test patterns are extracted into helpers
