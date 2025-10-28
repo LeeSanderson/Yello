@@ -1,7 +1,7 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { Hono } from 'hono';
 import { createMeRoutes } from './me';
-import { ContainerBuilder, MiddlewareHandlerBuilder, TestHelpers } from '@/utils/testing';
+import { ContainerBuilder, MiddlewareHandlerBuilder, TestHelpers } from '../../utils/testing';
 
 describe('Me Route', () => {
   let app: Hono;

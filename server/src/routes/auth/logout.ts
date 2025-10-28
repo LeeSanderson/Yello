@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import { ErrorMessage } from './responseTypes';
+import { ErrorMessage } from '../responseTypes';
 
 /**
  * Creates user logout routes

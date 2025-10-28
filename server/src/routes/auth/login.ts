@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import type { Container } from '../container/Container';
-import type { IUserService, LoginResponse } from '../services/UserService';
-import { loginSchema } from '../validation/auth';
-import { AuthenticationError } from '../services/UserService';
-import { ErrorMessage, ValidationErrorMessage } from './responseTypes';
+import type { Container } from '../../container/Container';
+import type { IUserService, LoginResponse } from '../../services/UserService';
+import { loginSchema } from '../../validation/auth';
+import { AuthenticationError } from '../../services/UserService';
+import { ErrorMessage, ValidationErrorMessage } from '../responseTypes';
 
 /**
  * Creates user login routes

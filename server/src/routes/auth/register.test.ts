@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
 import { Hono } from 'hono';
 import { createRegisterRoutes } from './register';
-import type { IUserService } from '../services/UserService';
-import { AuthenticationError } from '../services/UserService';
-import { ContainerBuilder, TestHelpers } from '../utils/testing';
+import type { IUserService } from '../../services/UserService';
+import { AuthenticationError } from '../../services/UserService';
+import { ContainerBuilder, TestHelpers } from '../../utils/testing';
 
 describe('Register Route', () => {
     let mockUserService: IUserService;

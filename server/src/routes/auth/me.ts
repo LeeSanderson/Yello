@@ -1,8 +1,8 @@
 import { Hono } from 'hono';
 import type { Context, MiddlewareHandler } from 'hono';
-import type { Container } from '../container/Container';
-import type { UserResponse } from '../services/UserService';
-import { ErrorMessage } from './responseTypes';
+import type { Container } from '../../container/Container';
+import type { UserResponse } from '../../services/UserService';
+import { ErrorMessage } from '../responseTypes';
 
 /**
  * Creates user profile routes

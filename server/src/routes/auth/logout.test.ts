@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
 import { Hono } from 'hono';
 import { createLogoutRoutes } from './logout';
-import { ContainerBuilder, TestHelpers } from '../utils/testing';
+import { ContainerBuilder, TestHelpers } from '../../utils/testing';
 
 describe('Logout Route', () => {
   let app: Hono;

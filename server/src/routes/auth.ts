@@ -1,9 +1,11 @@
 import { Hono } from 'hono';
 import type { Container } from '../container/Container';
-import { createRegisterRoutes } from './register';
-import { createLoginRoutes } from './login';
-import { createMeRoutes } from './me';
-import { createLogoutRoutes } from './logout';
+import { 
+  createRegisterRoutes, 
+  createLoginRoutes, 
+  createMeRoutes, 
+  createLogoutRoutes 
+} from './auth/index';
 
 /**
  * Creates authentication routes with dependency injection

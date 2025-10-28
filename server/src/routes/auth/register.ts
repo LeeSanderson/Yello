@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import type { Container } from '../container/Container';
-import type { IUserService } from '../services/UserService';
-import { registerSchema } from '../validation/auth';
-import { AuthenticationError, UserResponse } from '../services/UserService';
-import { ErrorMessage, ValidationErrorMessage } from './responseTypes';
+import type { Container } from '../../container/Container';
+import type { IUserService } from '../../services/UserService';
+import { registerSchema } from '../../validation/auth';
+import { AuthenticationError, UserResponse } from '../../services/UserService';
+import { ErrorMessage, ValidationErrorMessage } from '../responseTypes';
 
 /**
  * Creates user registration routes

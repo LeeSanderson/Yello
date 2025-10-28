@@ -23,7 +23,7 @@ const IntegrationTestHelpers = {
     login: mock(),
   }),
 
-  createMockAuthMiddleware: (): MiddlewareHandler => 
+  createMockAuthMiddleware: (): MiddlewareHandler =>
     mock(async (c: Context, next: Next) => await next()),
 
   // Container setup helpers
@@ -31,10 +31,10 @@ const IntegrationTestHelpers = {
     const container = new Container();
     const userService = IntegrationTestHelpers.createMockUserService();
     const authMiddleware = IntegrationTestHelpers.createMockAuthMiddleware();
-    
+
     container.register<IUserService>('userService', () => userService);
     container.register<MiddlewareHandler>('authMiddleware', () => authMiddleware);
-    
+
     return container;
   },
 
@@ -47,7 +47,7 @@ const IntegrationTestHelpers = {
   // App setup helpers
   setupMainAppWithAuthRoutes: (container: Container): Hono => {
     const app = new Hono();
-    
+
     // Simulate main app setup with middleware
     app.use('*', async (c: Context, next: Next) => {
       // Add request ID for testing
@@ -70,7 +70,7 @@ const IntegrationTestHelpers = {
   // Request helpers
   makeRequest: async (app: Hono, path: string, method: string = 'GET', body?: any, headers?: Record<string, string>): Promise<Response> => {
     const requestOptions: RequestInit = { method };
-    
+
     if (body) {
       requestOptions.body = JSON.stringify(body);
       requestOptions.headers = { 'Content-Type': 'application/json', ...headers };
@@ -84,7 +84,7 @@ const IntegrationTestHelpers = {
   // Route accessibility test helpers
   testRouteAccessibility: async (app: Hono, routes: Array<{ path: string; method: string; expectedStatus?: number }>) => {
     const results = [];
-    
+
     for (const route of routes) {
       try {
         const response = await IntegrationTestHelpers.makeRequest(app, route.path, route.method);
@@ -104,7 +104,7 @@ const IntegrationTestHelpers = {
         });
       }
     }
-    
+
     return results;
   },
 
@@ -152,7 +152,7 @@ describe('Route Registration Integration Tests', () => {
     it('should maintain proper route ordering with existing routes', async () => {
       // Test that existing routes still work after auth routes are mounted
       const response = await IntegrationTestHelpers.makeRequest(app, '/api/health', 'GET');
-      
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data.status).toBe('ok');
@@ -160,7 +160,7 @@ describe('Route Registration Integration Tests', () => {
 
     it('should handle 404 for non-existent routes', async () => {
       const response = await IntegrationTestHelpers.makeRequest(app, '/api/nonexistent', 'GET');
-      
+
       expect(response.status).toBe(404);
       const data = await response.json();
       expect(data.error).toBe('Not Found');
@@ -197,7 +197,7 @@ describe('Route Registration Integration Tests', () => {
 
       for (const test of methodTests) {
         const response = await IntegrationTestHelpers.makeRequest(app, test.path, test.method);
-        
+
         if (test.shouldWork) {
           // Should not return 404 or 405 (Method Not Allowed)
           expect(response.status).not.toBe(404);
@@ -214,7 +214,7 @@ describe('Route Registration Integration Tests', () => {
     it('should handle missing service dependencies gracefully', async () => {
       // Create container without required services
       const invalidContainer = IntegrationTestHelpers.setupInvalidContainer();
-      
+
       // Attempting to create auth routes should throw an error
       expect(() => {
         IntegrationTestHelpers.setupMainAppWithAuthRoutes(invalidContainer);
@@ -223,13 +223,13 @@ describe('Route Registration Integration Tests', () => {
 
     it('should handle container service resolution failures', async () => {
       const container = new Container();
-      
+
       // Register a service that throws during resolution
       container.register<IUserService>('userService', () => {
         throw new Error('Service initialization failed');
       });
-      
-      container.register<MiddlewareHandler>('authMiddleware', () => 
+
+      container.register<MiddlewareHandler>('authMiddleware', () =>
         IntegrationTestHelpers.createMockAuthMiddleware()
       );
 
@@ -242,18 +242,18 @@ describe('Route Registration Integration Tests', () => {
     it('should handle malformed route mounting', async () => {
       const container = IntegrationTestHelpers.setupValidContainer();
       const app = new Hono();
-      
+
       // Test mounting routes with invalid path - Hono actually allows empty paths
       // So we test that the routes are still accessible but at root level
       app.route('', createAuthRoutes(container));
-      
+
       // Routes should be accessible at root level
       const response = await IntegrationTestHelpers.makeRequest(app, '/register', 'POST', {
         name: 'Test User',
-        email: 'test@example.com', 
+        email: 'test@example.com',
         password: 'password123'
       });
-      
+
       // Should be accessible (not 404)
       expect(response.status).not.toBe(404);
     });
@@ -277,7 +277,7 @@ describe('Route Registration Integration Tests', () => {
 
       for (const test of errorTests) {
         const response = await IntegrationTestHelpers.makeRequest(app, test.path, test.method, test.body);
-        
+
         expect(response.status).toBe(400);
         const data = await response.json();
         expect(data).toHaveProperty('error');
@@ -290,14 +290,14 @@ describe('Route Registration Integration Tests', () => {
     it('should handle JSON parsing errors consistently', async () => {
       // Test routes with malformed JSON
       const routes = ['/api/auth/register', '/api/auth/login'];
-      
+
       for (const route of routes) {
         const response = await app.request(route, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: 'invalid-json{'
         });
-        
+
         // Hono returns 500 for JSON parsing errors, which is acceptable
         // The important thing is that it doesn't crash the server
         expect([400, 500]).toContain(response.status);
@@ -308,7 +308,7 @@ describe('Route Registration Integration Tests', () => {
       // Test that routes don't interfere with each other
       const mockUser = IntegrationTestHelpers.createValidUser();
       const userService = container.get<IUserService>('userService');
-      
+
       // Setup different responses for different calls
       (userService.register as any).mockResolvedValue(mockUser);
       (userService.login as any).mockResolvedValue({ user: mockUser, token: 'test-token' });
