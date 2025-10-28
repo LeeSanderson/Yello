@@ -15,10 +15,10 @@ describe('Logout Route', () => {
   });
 
 
-  describe('POST /auth/logout', () => {
+  describe('POST /logout', () => {
     it('should logout successfully without authentication', async () => {
       // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/logout', 'POST');
+      const response = await TestHelpers.makeRequest(app, '/logout', 'POST');
 
       // Assert
       expect(response).toBeJson(200, {message: 'Logout successful'});
@@ -26,7 +26,7 @@ describe('Logout Route', () => {
 
     it('should logout successfully with authorization header', async () => {
       // Act
-      const response = await TestHelpers.makeRequest(app, '/auth/logout', 'POST', null, {
+      const response = await TestHelpers.makeRequest(app, '/logout', 'POST', null, {
         'Authorization': 'Bearer some-token'
       });
 

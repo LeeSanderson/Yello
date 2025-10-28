@@ -17,14 +17,14 @@ describe('Me Route', () => {
     mock.restore()
   });  
 
-  describe('GET /auth/me', () => {
+  describe('GET /me', () => {
     it('should return user profile when authenticated', async () => {
       // Arrange
       const user = TestHelpers.createValidUser();
       authMiddleware.setCurrentUser(user);
 
       // Act
-      const response = await TestHelpers.makeGetRequest(app, '/auth/me', {
+      const response = await TestHelpers.makeGetRequest(app, '/me', {
         'Authorization': 'Bearer valid-token'
       });
 
@@ -37,7 +37,7 @@ describe('Me Route', () => {
       authMiddleware.setUnauthorized();
 
       // Act
-      const response = await TestHelpers.makeGetRequest(app, '/auth/me');
+      const response = await TestHelpers.makeGetRequest(app, '/me');
 
       // Assert
       expect(response)
@@ -49,7 +49,7 @@ describe('Me Route', () => {
       authMiddleware.setThrowError();
 
       // Act
-      const response = await TestHelpers.makeGetRequest(app, '/auth/me', {
+      const response = await TestHelpers.makeGetRequest(app, '/me', {
         'Authorization': 'Bearer some-token'
       });
 

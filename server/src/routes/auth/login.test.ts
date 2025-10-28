@@ -20,7 +20,7 @@ describe('Login Route', () => {
     mock.restore()
   });
 
-  describe('POST /auth/login', () => {
+  describe('POST /login', () => {
     it('should login user successfully with valid credentials', async () => {
       // Arrange
       const loginData = TestHelpers.createValidLoginData();
@@ -29,7 +29,7 @@ describe('Login Route', () => {
       (mockUserService.login as any).mockResolvedValue(expectedResult);
 
       // Act
-      const response = await TestHelpers.makePostRequest(app, '/auth/login', loginData);
+      const response = await TestHelpers.makePostRequest(app, '/login', loginData);
   
       // Assert
       expect(response)
@@ -43,7 +43,7 @@ describe('Login Route', () => {
 
     it('should reject login with validation errors for empty fields', async () => {
       // Act
-      const response = await TestHelpers.makePostRequest(app, '/auth/login', {
+      const response = await TestHelpers.makePostRequest(app, '/login', {
         email: '',
         password: ''
       });
@@ -71,7 +71,7 @@ describe('Login Route', () => {
       );
 
       // Act
-      const response = await TestHelpers.makePostRequest(app, '/auth/login', loginData);
+      const response = await TestHelpers.makePostRequest(app, '/login', loginData);
 
       // Assert
       await expect(response)
@@ -84,7 +84,7 @@ describe('Login Route', () => {
       (mockUserService.login as any).mockRejectedValue(new Error('Database error'));
 
       // Act
-      const response = await TestHelpers.makePostRequest(app, '/auth/login', loginData);
+      const response = await TestHelpers.makePostRequest(app, '/login', loginData);
 
       // Assert
       expect(response)
@@ -93,7 +93,7 @@ describe('Login Route', () => {
 
     it('should handle malformed JSON gracefully', async () => {
       // Act
-      const response = await app.request('/auth/login', {
+      const response = await app.request('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: 'invalid-json{'

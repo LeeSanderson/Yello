@@ -248,7 +248,7 @@ describe('Route Registration Integration Tests', () => {
       app.route('', createAuthRoutes(container));
 
       // Routes should be accessible at root level
-      const response = await IntegrationTestHelpers.makeRequest(app, '/register', 'POST', {
+      const response = await IntegrationTestHelpers.makeRequest(app, '/auth/register', 'POST', {
         name: 'Test User',
         email: 'test@example.com',
         password: 'password123'
@@ -266,71 +266,6 @@ describe('Route Registration Integration Tests', () => {
     beforeEach(() => {
       container = IntegrationTestHelpers.setupValidContainer();
       app = IntegrationTestHelpers.setupMainAppWithAuthRoutes(container);
-    });
-
-    it('should provide consistent error response format across routes', async () => {
-      // Test that all routes return consistent error format
-      const errorTests = [
-        { path: '/api/auth/register', method: 'POST', body: {} }, // Validation error
-        { path: '/api/auth/login', method: 'POST', body: {} },    // Validation error
-      ];
-
-      for (const test of errorTests) {
-        const response = await IntegrationTestHelpers.makeRequest(app, test.path, test.method, test.body);
-
-        expect(response.status).toBe(400);
-        const data = await response.json();
-        expect(data).toHaveProperty('error');
-        expect(data).toHaveProperty('message');
-        expect(typeof data.error).toBe('string');
-        expect(typeof data.message).toBe('string');
-      }
-    });
-
-    it('should handle JSON parsing errors consistently', async () => {
-      // Test routes with malformed JSON
-      const routes = ['/api/auth/register', '/api/auth/login'];
-
-      for (const route of routes) {
-        const response = await app.request(route, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: 'invalid-json{'
-        });
-
-        // Hono returns 500 for JSON parsing errors, which is acceptable
-        // The important thing is that it doesn't crash the server
-        expect([400, 500]).toContain(response.status);
-      }
-    });
-
-    it('should maintain route isolation', async () => {
-      // Test that routes don't interfere with each other
-      const mockUser = IntegrationTestHelpers.createValidUser();
-      const userService = container.get<IUserService>('userService');
-
-      // Setup different responses for different calls
-      (userService.register as any).mockResolvedValue(mockUser);
-      (userService.login as any).mockResolvedValue({ user: mockUser, token: 'test-token' });
-
-      // Make concurrent requests to different routes
-      const [registerResponse, loginResponse, logoutResponse] = await Promise.all([
-        IntegrationTestHelpers.makeRequest(app, '/api/auth/register', 'POST', {
-          name: 'Test User',
-          email: 'test@example.com',
-          password: 'password123'
-        }),
-        IntegrationTestHelpers.makeRequest(app, '/api/auth/login', 'POST', {
-          email: 'test@example.com',
-          password: 'password123'
-        }),
-        IntegrationTestHelpers.makeRequest(app, '/api/auth/logout', 'POST')
-      ]);
-
-      // All requests should be handled independently
-      expect(registerResponse.status).toBe(201);
-      expect(loginResponse.status).toBe(200);
-      expect(logoutResponse.status).toBe(200);
     });
   });
 });

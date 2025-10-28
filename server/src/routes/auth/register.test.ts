@@ -19,7 +19,7 @@ describe('Register Route', () => {
         mock.restore()
     });    
 
-    describe('POST /auth/register', () => {
+    describe('POST /register', () => {
         it('should register user successfully with valid data', async () => {
             // Arrange
             const userData = TestHelpers.createValidRegisterData();
@@ -27,7 +27,7 @@ describe('Register Route', () => {
             (mockUserService.register as any).mockResolvedValue(expectedUser);
 
             // Act
-            const response = await TestHelpers.makePostRequest(app, '/auth/register', userData);
+            const response = await TestHelpers.makePostRequest(app, '/register', userData);
 
             // Assert
             expect(response).toBeJson(201, TestHelpers.normalizeUserDates(expectedUser));
@@ -36,7 +36,7 @@ describe('Register Route', () => {
 
         it('should reject registration with validation errors for empty fields', async () => {
             // Act
-            const response = await TestHelpers.makePostRequest(app, '/auth/register', {
+            const response = await TestHelpers.makePostRequest(app, '/register', {
                 name: '',
                 email: '',
                 password: ''
@@ -63,7 +63,7 @@ describe('Register Route', () => {
             (mockUserService.register as any).mockRejectedValue(AuthenticationError.emailAlreadyExists());
 
             // Act
-            const response = await TestHelpers.makePostRequest(app, '/auth/register', userData);
+            const response = await TestHelpers.makePostRequest(app, '/register', userData);
 
             // Assert
             expect(response)
@@ -76,7 +76,7 @@ describe('Register Route', () => {
             (mockUserService.register as any).mockRejectedValue(new Error('Database error'));
 
             // Act
-            const response = await TestHelpers.makePostRequest(app, '/auth/register', userData);
+            const response = await TestHelpers.makePostRequest(app, '/register', userData);
 
             // Assert
             expect(response)
@@ -85,7 +85,7 @@ describe('Register Route', () => {
 
         it('should handle malformed JSON gracefully', async () => {
             // Act
-            const response = await app.request('/auth/register', {
+            const response = await app.request('/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: 'invalid-json{'

@@ -4,7 +4,9 @@ import { Container } from '../container/Container';
 import type { IUserService, RegisterUserData, LoginUserData, UserResponse } from '../services/UserService';
 import { expect } from "bun:test";
 import "bun:test";
-import { ErrorMessage } from '@/routes/responseTypes';
+import { DatabaseConnection } from '@/db/connection';
+import { createInMemoryDatabaseConnection } from '@/db/connection.mock';
+import { IDateService } from '@/services';
 
 export type MiddlewareHandlerFunc = (c: Context, next: Next) => Promise<Response | void>;
 
@@ -67,6 +69,17 @@ export class ContainerBuilder {
     return middlewareBuilder
   }
 
+  async addInMemoryDatabase(): Promise<DatabaseConnection> {
+    const database = await createInMemoryDatabaseConnection()
+    this.container.register<DatabaseConnection>('database', () => database);
+    return database;
+  }
+
+  addMockDateService(): IDateService {
+    const dateService = { now: mock(() => new Date())};
+    this.container.register<IDateService>('dateService', () => dateService);
+    return dateService;
+  }
 
   toContainer(): Container {
     return this.container
@@ -128,9 +141,9 @@ export class TestHelpers {
   /**
    * Sets up a basic Hono app with routes mounted at a specific path
    */
-  static setupApp(routeCreator: (container: Container) => Hono, container: Container, mountPath: string = '/auth'): Hono {
+  static setupApp(routeCreator: (container: Container) => Hono, container: Container): Hono {
     const app = new Hono();
-    app.route(mountPath, routeCreator(container));
+    app.route('/', routeCreator(container));
     return app;
   }
 

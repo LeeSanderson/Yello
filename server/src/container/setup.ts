@@ -4,9 +4,9 @@ import { IUserRepository, UserRepository } from '../repositories/UserRepository'
 import { WorkspaceRepository } from '../repositories/WorkspaceRepository';
 import { ProjectRepository } from '../repositories/ProjectRepository';
 import { TaskRepository } from '../repositories/TaskRepository';
-import { IUserService, UserService } from '../services/UserService';
 import { AuthHelper, IAuthHelper } from '../middleware/AuthHelper';
 import { createAuthMiddleware, createOptionalAuthMiddleware } from '../middleware/auth';
+import { IUserService, UserService, IDateService, DateService } from '@/services';
 
 export function setupContainer(): Container {
   const container = new Container();
@@ -36,6 +36,8 @@ export function setupContainer(): Container {
     new UserService(container.get<IUserRepository>('userRepository'))
   );
 
+  container.register<IDateService>('dateService', () => new DateService());
+ 
   // Register authentication helpers and middleware
   container.register<IAuthHelper>('authHelper', () => 
     new AuthHelper(container.get<IUserRepository>('userRepository'))

@@ -1,2 +1,11 @@
-export { UserService, AuthenticationError, ValidationError } from './UserService';
-export type { IUserService, RegisterUserData, LoginUserData, UserResponse, LoginResponse } from './UserService';
+export { 
+    IUserService, 
+    UserService, 
+    AuthenticationError,
+    RegisterUserData, 
+    LoginUserData, 
+    UserResponse, 
+    LoginResponse,
+} from './UserService';
+
+export { IDateService, DateService } from './DateService';
