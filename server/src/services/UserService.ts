@@ -1,3 +1,4 @@
+import { ContentfulStatusCode } from 'hono/utils/http-status';
 import type { IUserRepository, User, CreateUserData } from '../repositories/UserRepository';
 import { PasswordUtils, JWTUtils } from '../utils';
 
@@ -26,7 +27,7 @@ export type LoginResponse = {
 };
 
 export class AuthenticationError extends Error {
-  constructor(message: string, public code: string) {
+  constructor(message: string, public code: string, public statusCode: ContentfulStatusCode  = 401) {
     super(message);
     this.name = 'AuthenticationError';
   }
@@ -34,7 +35,8 @@ export class AuthenticationError extends Error {
   static emailAlreadyExists(): AuthenticationError {
       return new AuthenticationError(
         'User with this email already exists',
-        'EMAIL_ALREADY_EXISTS'
+        'EMAIL_ALREADY_EXISTS',
+        409
       );
   }
 
@@ -43,22 +45,14 @@ export class AuthenticationError extends Error {
         'Invalid email or password',
         'INVALID_CREDENTIALS'
       );
-
-  }
-}
-
-export class ValidationError extends Error {
-  constructor(message: string, public code: string) {
-    super(message);
-    this.name = 'ValidationError';
   }
 
-  static invalidPassword(passwordValidationErrors: string[]): ValidationError {
-      throw new ValidationError(
+  static invalidPassword(passwordValidationErrors: string[]): AuthenticationError {
+      throw new AuthenticationError(
         passwordValidationErrors.join(', '),
         'INVALID_PASSWORD'
       );
-  }
+  }  
 }
 
 export interface IUserService {
@@ -75,7 +69,7 @@ export class UserService implements IUserService {
     // Validate password strength
     const passwordValidation = PasswordUtils.validatePasswordStrength(password);
     if (!passwordValidation.isValid) {
-      throw ValidationError.invalidPassword(passwordValidation.errors);
+      throw AuthenticationError.invalidPassword(passwordValidation.errors);
     }
 
     // Check if user already exists

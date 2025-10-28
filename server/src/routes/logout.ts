@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
+import { ErrorMessage } from './responseTypes';
 
 /**
  * Creates user logout routes
@@ -25,7 +26,7 @@ export function createLogoutRoutes(): Hono {
       console.error('Logout error:', error);
 
       // Generic server error
-      return c.json({
+      return c.json<ErrorMessage>({
         error: 'Internal server error',
         message: 'Failed to logout user'
       }, 500);

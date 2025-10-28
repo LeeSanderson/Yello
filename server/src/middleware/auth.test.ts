@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeEach } from 'bun:test';
+import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { createAuthMiddleware, createOptionalAuthMiddleware } from './auth';
 import type { IAuthHelper } from './AuthHelper';
 import type { UserResponse } from '../services';
@@ -43,7 +43,10 @@ describe('Authentication Middleware', () => {
             requestContext = c;
             return c.text("OK")
         });
+    });
 
+    afterEach(() => {
+        mock.restore();
     });
 
     describe('createAuthMiddleware', () => {

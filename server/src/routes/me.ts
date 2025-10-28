@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { Context, MiddlewareHandler } from 'hono';
 import type { Container } from '../container/Container';
 import type { UserResponse } from '../services/UserService';
+import { ErrorMessage } from './responseTypes';
 
 /**
  * Creates user profile routes
@@ -23,15 +24,13 @@ export function createMeRoutes(container: Container): Hono {
       const user = c.get('user') as UserResponse;
 
       // Return user profile information
-      return c.json({
-        user
-      }, 200);
+      return c.json<UserResponse>(user, 200);
 
     } catch (error) {
       console.error('Profile error:', error);
 
       // Generic server error
-      return c.json({
+      return c.json<ErrorMessage>({
         error: 'Internal server error',
         message: 'Failed to retrieve user profile'
       }, 500);

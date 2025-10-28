@@ -1,6 +1,6 @@
 import { describe, it, expect, mock, beforeEach, spyOn } from 'bun:test';
-import { UserService, AuthenticationError, ValidationError } from './UserService';
-import type { IUserRepository, User, CreateUserData } from '../repositories/UserRepository';
+import { UserService, AuthenticationError } from './UserService';
+import type { IUserRepository, User } from '../repositories/UserRepository';
 import { PasswordUtils, JWTUtils } from '../utils';
 
 describe('UserService', () => {
@@ -79,7 +79,7 @@ describe('UserService', () => {
         password: 'short',
       };
 
-      await expect(userService.register(invalidUserData)).rejects.toThrow(ValidationError);
+      await expect(userService.register(invalidUserData)).rejects.toThrow(AuthenticationError);
       await expect(userService.register(invalidUserData)).rejects.toThrow('Password must be at least 8 characters long');
 
       expect(validatePasswordSpy).toHaveBeenCalledWith('short');
