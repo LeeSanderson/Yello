@@ -1,7 +1,7 @@
 import { mock } from 'bun:test';
 import { Context, Hono, MiddlewareHandler, Next } from 'hono';
 import { Container } from '../container/Container';
-import type { IUserService, RegisterUserData, LoginUserData, UserResponse } from '../services/UserService';
+import type { IUserService, RegisterUserData, LoginUserData, UserResponse } from '../services';
 import { expect } from "bun:test";
 import "bun:test";
 import { DatabaseConnection } from '@/db/connection';

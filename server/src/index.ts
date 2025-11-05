@@ -1,91 +1,10 @@
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 import { testConnection, type DatabaseConnection } from './db/connection';
 import { setupContainer } from './container/setup';
-import { createAuthRoutes } from './routes/auth';
-import type { UserRepository } from './repositories/UserRepository';
-import type { WorkspaceRepository } from './repositories/WorkspaceRepository';
-import type { ProjectRepository } from './repositories/ProjectRepository';
-import type { TaskRepository } from './repositories/TaskRepository';
-import type { MiddlewareHandler } from 'hono';
+import { createApp } from './routes/app';
 
 // Setup dependency injection container
 const container = setupContainer();
-const app = new Hono();
-
-// Get authentication middleware from container
-const authMiddleware = container.get<MiddlewareHandler>('authMiddleware');
-
-// Middleware
-app.use('*', cors({
-  origin: 'http://localhost:5173', // Vite dev server
-  credentials: true,
-}));
-
-// Routes
-app.get('/api/health', async (c) => {
-  const db = container.get<DatabaseConnection>('database');
-  const dbConnected = await testConnection(db);
-  return c.json({ 
-    status: dbConnected ? 'ok' : 'error', 
-    service: 'yellow-api',
-    database: dbConnected ? 'connected' : 'disconnected',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Authentication routes
-app.route('/api/auth', createAuthRoutes(container));
-
-// Protected routes - require authentication
-app.get('/api/users', authMiddleware, async (c) => {
-  try {
-    const userRepository = container.get<UserRepository>('userRepository');
-    const allUsers = await userRepository.findAll();
-    return c.json({ data: allUsers });
-  } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to fetch users' }, 500);
-  }
-});
-
-app.get('/api/workspaces', authMiddleware, async (c) => {
-  try {
-    const workspaceRepository = container.get<WorkspaceRepository>('workspaceRepository');
-    const allWorkspaces = await workspaceRepository.findAll();
-    return c.json({ data: allWorkspaces });
-  } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to fetch workspaces' }, 500);
-  }
-});
-
-app.get('/api/projects', authMiddleware, async (c) => {
-  try {
-    const projectRepository = container.get<ProjectRepository>('projectRepository');
-    const allProjects = await projectRepository.findAll();
-    return c.json({ data: allProjects });
-  } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to fetch projects' }, 500);
-  }
-});
-
-app.get('/api/tasks', authMiddleware, async (c) => {
-  try {
-    const taskRepository = container.get<TaskRepository>('taskRepository');
-    const allTasks = await taskRepository.findAll();
-    return c.json({ data: allTasks });
-  } catch (error) {
-    console.error('Database error:', error);
-    return c.json({ error: 'Failed to fetch tasks' }, 500);
-  }
-});
-
-// 404 handler
-app.notFound((c) => {
-  return c.json({ error: 'Not Found' }, 404);
-});
+const app = createApp(container);
 
 const port = process.env.PORT || 3000;
 

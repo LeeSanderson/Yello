@@ -1,9 +1,9 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { Container } from '../../container/Container';
-import type { IUserService, LoginResponse } from '../../services/UserService';
+import type { IUserService, LoginResponse } from '../../services';
 import { loginSchema } from '../../validation/auth';
-import { AuthenticationError } from '../../services/UserService';
+import { AuthenticationError } from '../../services';
 import { ErrorMessage, ValidationErrorMessage } from '../responseTypes';
 
 /**

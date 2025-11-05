@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
 import { Hono } from 'hono';
 import { createLoginRoutes } from './login';
-import type { IUserService } from '../../services/UserService';
-import { AuthenticationError } from '../../services/UserService';
+import type { IUserService } from '../../services';
+import { AuthenticationError } from '../../services';
 import { ContainerBuilder, TestHelpers } from '../../utils/testing';
 
 

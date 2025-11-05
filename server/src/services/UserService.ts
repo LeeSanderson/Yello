@@ -27,32 +27,32 @@ export type LoginResponse = {
 };
 
 export class AuthenticationError extends Error {
-  constructor(message: string, public code: string, public statusCode: ContentfulStatusCode  = 401) {
+  constructor(message: string, public code: string, public statusCode: ContentfulStatusCode = 401) {
     super(message);
     this.name = 'AuthenticationError';
   }
 
   static emailAlreadyExists(): AuthenticationError {
-      return new AuthenticationError(
-        'User with this email already exists',
-        'EMAIL_ALREADY_EXISTS',
-        409
-      );
+    return new AuthenticationError(
+      'User with this email already exists',
+      'EMAIL_ALREADY_EXISTS',
+      409
+    );
   }
 
   static invalidCredentials(): AuthenticationError {
-      return new AuthenticationError(
-        'Invalid email or password',
-        'INVALID_CREDENTIALS'
-      );
+    return new AuthenticationError(
+      'Invalid email or password',
+      'INVALID_CREDENTIALS'
+    );
   }
 
   static invalidPassword(passwordValidationErrors: string[]): AuthenticationError {
-      throw new AuthenticationError(
-        passwordValidationErrors.join(', '),
-        'INVALID_PASSWORD'
-      );
-  }  
+    return new AuthenticationError(
+      passwordValidationErrors.join(', '),
+      'INVALID_PASSWORD'
+    );
+  }
 }
 
 export interface IUserService {
@@ -61,7 +61,7 @@ export interface IUserService {
 }
 
 export class UserService implements IUserService {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private userRepository: IUserRepository) { }
 
   async register(userData: RegisterUserData): Promise<UserResponse> {
     const { name, email, password } = userData;
@@ -95,7 +95,7 @@ export class UserService implements IUserService {
 
     try {
       const user = await this.userRepository.create(createUserData);
-      
+
       // Return user data without password hash
       return {
         id: user.id,

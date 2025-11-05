@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import type { Context, MiddlewareHandler } from 'hono';
 import type { Container } from '../../container/Container';
-import type { UserResponse } from '../../services/UserService';
+import type { UserResponse } from '../../services';
 import { ErrorMessage } from '../responseTypes';
 
 /**
