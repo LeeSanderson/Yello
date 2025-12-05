@@ -10,10 +10,36 @@ This document outlines testing standards and practices for the Yellow project to
 - Tests should be written to verify the code works as expected before moving to the next task
 - Run tests after implementation to ensure functionality works correctly
 
-### Testing Hierarchy
-1. **Unit Tests**: Test individual functions, classes, and components in isolation
-2. **Integration Tests**: Test interactions between components and external systems
-3. **End-to-End Tests**: Test complete user workflows and system behavior
+### Testing Pyramid
+The testing pyramid guides our test distribution and focus:
+
+```
+        /\
+       /E2E\      ← Few, high-level, slow
+      /------\
+     /  INT   \   ← Some, mid-level, moderate
+    /----------\
+   /    UNIT    \ ← Many, low-level, fast
+  /--------------\
+```
+
+1. **Unit Tests (Base - Most Tests)**: Test individual functions, classes, and components in isolation
+   - 70-80% of total tests
+   - Fast execution (< 100ms per test)
+   - Mock all external dependencies
+   - Focus on business logic, edge cases, and error handling
+
+2. **Integration Tests (Middle - Moderate Tests)**: Test interactions between components and external systems
+   - 15-25% of total tests
+   - Moderate execution time (< 1s per test)
+   - Use real dependencies where practical (database, services)
+   - Focus on component interactions, not low-level details already covered by unit tests
+
+3. **End-to-End Tests (Top - Fewest Tests)**: Test complete user workflows and system behavior
+   - 5-10% of total tests
+   - Slower execution (seconds per test)
+   - Test through the UI or API as a user would
+   - Focus on critical user journeys, not exhaustive scenario coverage
 
 ## Testing Requirements for Specs
 
@@ -25,6 +51,8 @@ This document outlines testing standards and practices for the Yellow project to
 - Integration tests should be included for API endpoints and cross-component interactions
 
 ### Test Task Format
+
+#### Unit Test Task (Required for all implementations)
 ```markdown
 - [ ] X.Y Implement [functionality]
   - Write [specific functionality] implementation
@@ -32,13 +60,41 @@ This document outlines testing standards and practices for the Yellow project to
   - _Requirements: [requirement references]_
 
 - [ ] X.Z Write unit tests for [functionality]
-  - Test successful [functionality] execution path
-  - Test [functionality] failure scenarios and error handling
+  - Test successful [functionality] execution path with valid inputs
+  - Test all edge cases and boundary conditions
+  - Test all error scenarios and error handling
+  - Test all validation rules and business logic branches
   - Create test helpers for common setup and assertions
   - Focus tests on unit behavior, not mock interactions
   - Run tests to verify [functionality] works correctly
   - **Run full test suite to catch any regressions**
   - Fix any failing tests before proceeding
+  - _Requirements: [same requirement references]_
+```
+
+#### Integration Test Task (Required for API endpoints and cross-component features)
+```markdown
+- [ ] X.Y Write integration tests for [feature/endpoint]
+  - Test successful request/response flow through system
+  - Test ONE example of validation failure (not all rules - covered by unit tests)
+  - Test database operations complete successfully
+  - Test middleware chain executes correctly
+  - Test correct HTTP status codes are returned
+  - Focus on component integration, not low-level details
+  - Run tests to verify [feature] integration works correctly
+  - **Run full test suite to catch any regressions**
+  - _Requirements: [same requirement references]_
+```
+
+#### End-to-End Test Task (Required for complete user workflows)
+```markdown
+- [ ] X.Y Write E2E tests for [user workflow]
+  - Test complete happy path user journey
+  - Test ONE critical error scenario (not all errors - covered by unit/integration tests)
+  - Test user can navigate through workflow successfully
+  - Focus on user experience, not implementation details
+  - Run tests to verify [workflow] works end-to-end
+  - **Run full test suite to catch any regressions**
   - _Requirements: [same requirement references]_
 ```
 
@@ -108,16 +164,38 @@ After completing each task (implementation + unit tests), **MUST** run the compl
 
 ### Integration Tests (Required for API endpoints)
 - **Scope**: Test interactions between components, database operations, API endpoints
+- **Focus**: Component integration, not low-level logic (covered by unit tests)
 - **Database**: Use test database with proper setup/teardown
-- **Authentication**: Test with various authentication states
-- **Error Handling**: Test error scenarios and proper HTTP status codes
-- **Data Validation**: Test input validation and sanitization
+- **What to Test**:
+  - API endpoint returns correct HTTP status codes
+  - Request/response flow through middleware chain
+  - Database transactions complete successfully
+  - Service layer integrates correctly with repository layer
+  - Authentication/authorization middleware works with protected routes
+- **What NOT to Test** (already covered by unit tests):
+  - Individual validation rules (test the validator works, not each rule)
+  - Specific error messages for each validation failure
+  - Business logic edge cases (test service integration, not all logic paths)
+  - Password hashing details (test authentication works, not hash algorithm)
+- **Example**: Test that POST /api/auth/register creates a user in the database and returns 201, not every validation rule
 
 ### End-to-End Tests (Required for complete workflows)
 - **Scope**: Test complete user workflows from frontend to backend
+- **Focus**: Critical user journeys, not exhaustive coverage
 - **Browser**: Use Playwright or similar for browser automation
 - **API**: Test complete API workflows with real HTTP requests
-- **Data**: Use realistic test data and scenarios
+- **What to Test**:
+  - Complete user registration and login flow
+  - Creating a project and adding tasks to it
+  - User can navigate through main application features
+  - Critical business workflows work end-to-end
+- **What NOT to Test** (already covered by unit/integration tests):
+  - Every validation error message
+  - Every edge case and error condition
+  - Individual component behavior
+  - Specific API response formats
+  - Low-level business logic
+- **Example**: Test that a user can register, login, create a project, and add a task - not every possible validation error during registration
 
 ## Testing Best Practices
 
@@ -404,6 +482,37 @@ bun test --coverage
 - Refactor tests to maintain readability and performance
 - Regular review of test coverage and effectiveness
 
+## Testing Pyramid in Practice
+
+### Applying the Pyramid to Yellow Project
+
+#### Unit Test Examples (Most Tests)
+- **Services**: Test UserService.createUser() with valid/invalid data, duplicate emails, password hashing
+- **Repositories**: Test UserRepository.findByEmail() returns correct user, handles not found
+- **Utilities**: Test password validation with weak/strong passwords, email format validation
+- **Middleware**: Test JWT validation with valid/invalid/expired tokens
+- **Components**: Test Button component renders correctly, handles click events
+
+#### Integration Test Examples (Moderate Tests)
+- **API Endpoints**: Test POST /api/auth/register creates user in database, returns 201 with token
+- **Service + Repository**: Test UserService.createUser() actually saves to database via repository
+- **Middleware Chain**: Test authentication middleware + authorization middleware protect routes
+- **Component + API**: Test LoginForm component successfully calls login API and handles response
+- **NOT**: Testing every validation rule (unit test), every error message (unit test), password hashing details (unit test)
+
+#### End-to-End Test Examples (Fewest Tests)
+- **User Registration Flow**: User visits signup page, fills form, submits, sees success, can login
+- **Project Creation Flow**: User logs in, creates project, adds task, sees task in project
+- **Authentication Flow**: User logs in, accesses protected page, logs out, cannot access protected page
+- **NOT**: Testing every validation error (unit test), every API response format (integration test), every edge case (unit test)
+
+### Test Distribution Guidelines
+
+For a typical feature (e.g., User Authentication):
+- **Unit Tests (70-80%)**: 20-30 tests covering services, repositories, utilities, validators, middleware
+- **Integration Tests (15-25%)**: 5-8 tests covering API endpoints, service+repository integration, middleware chains
+- **End-to-End Tests (5-10%)**: 1-3 tests covering complete registration, login, and logout flows
+
 ## Spec Implementation Requirements
 
 When creating implementation plans for specs:
@@ -411,11 +520,12 @@ When creating implementation plans for specs:
 1. **Every implementation task MUST be followed by a unit test task**
 2. **Test tasks must include verification that tests pass**
 3. **Test tasks MUST include full test suite execution to catch regressions**
-4. **Integration tests must be included for API endpoints**
-5. **End-to-end tests must be included for complete workflows**
+4. **Integration tests must be included for API endpoints** (focus on integration, not details)
+5. **End-to-End tests must be included for complete workflows** (focus on user journeys, not exhaustive coverage)
 6. **Test tasks must reference the same requirements as implementation tasks**
 7. **All regressions must be fixed before considering a task complete**
 8. **Test execution must be verified before moving to the next implementation step**
+9. **Follow the testing pyramid**: Most unit tests, some integration tests, few E2E tests
 
 ### Regression Prevention Workflow
 For each task completion:
@@ -428,6 +538,197 @@ For each task completion:
 7. Proceed to next task only after all tests pass
 
 This ensures that all code is properly tested, verified to work correctly, and doesn't break existing functionality before moving to the next implementation step.
+
+## Practical Example: User Authentication Feature
+
+### Applying the Testing Pyramid
+
+#### Unit Tests (70-80% of tests - ~25 tests)
+**Password Utilities** (5 tests)
+- Test password hashing with valid password
+- Test password comparison with correct password
+- Test password comparison with incorrect password
+- Test password validation rejects weak passwords
+- Test password validation accepts strong passwords
+
+**Email Validation** (4 tests)
+- Test email validation rejects invalid formats
+- Test email validation rejects missing @ symbol
+- Test email validation rejects missing domain
+- Test email validation accepts valid emails
+
+**JWT Service** (6 tests)
+- Test token generation with valid user data
+- Test token verification with valid token
+- Test token verification with expired token
+- Test token verification with invalid signature
+- Test token verification with malformed token
+- Test token extraction from Authorization header
+
+**User Service** (6 tests)
+- Test user registration with valid data
+- Test user registration with duplicate email
+- Test user login with correct credentials
+- Test user login with incorrect password
+- Test user login with non-existent email
+- Test password hashing is called during registration
+
+**User Repository** (4 tests)
+- Test findByEmail returns user when found
+- Test findByEmail returns null when not found
+- Test create saves user to database
+- Test create returns created user with id
+
+#### Integration Tests (15-25% of tests - ~6 tests)
+**Registration Endpoint** (2 tests)
+- Test POST /api/auth/register creates user in database and returns 201 with token
+- Test POST /api/auth/register returns 400 when validation fails (one example, not all rules)
+
+**Login Endpoint** (2 tests)
+- Test POST /api/auth/login returns 200 with token when credentials are valid
+- Test POST /api/auth/login returns 401 when credentials are invalid (one example)
+
+**Protected Routes** (2 tests)
+- Test authenticated request to protected route succeeds with valid token
+- Test unauthenticated request to protected route returns 401
+
+#### End-to-End Tests (5-10% of tests - ~2 tests)
+**User Registration and Login Flow** (1 test)
+- User visits registration page, fills form with valid data, submits, sees success message, is redirected to dashboard
+
+**Authentication Flow** (1 test)
+- User logs in, accesses protected page successfully, logs out, cannot access protected page
+
+### What NOT to Test at Each Level
+
+#### ❌ Don't Test in Integration Tests
+- Every password validation rule (covered by unit tests)
+- Every email validation rule (covered by unit tests)
+- Every JWT token error scenario (covered by unit tests)
+- Specific error message content (covered by unit tests)
+- Password hashing algorithm details (covered by unit tests)
+
+#### ❌ Don't Test in E2E Tests
+- Invalid email format errors (covered by unit tests)
+- Weak password errors (covered by unit tests)
+- API response structure details (covered by integration tests)
+- Database transaction details (covered by integration tests)
+- Every possible error scenario (covered by unit/integration tests)
+
+### Test Count Summary
+- **Unit Tests**: ~25 tests (78% of total)
+- **Integration Tests**: ~6 tests (19% of total)
+- **E2E Tests**: ~2 tests (3% of total)
+- **Total**: ~32 tests following the pyramid distribution
+
+## Avoiding Test Duplication Across Layers
+
+### The Anti-Pattern: Testing the Same Thing Multiple Times
+A common mistake is testing low-level details at every layer of the pyramid:
+
+#### ❌ Bad Example: Over-Testing Validation
+```typescript
+// Unit test (CORRECT - test all validation rules)
+describe('validateEmail', () => {
+  it('should reject invalid email formats', () => { /* ... */ });
+  it('should reject emails without @', () => { /* ... */ });
+  it('should reject emails without domain', () => { /* ... */ });
+  it('should accept valid emails', () => { /* ... */ });
+});
+
+// Integration test (WRONG - retesting validation details)
+describe('POST /api/auth/register', () => {
+  it('should return 400 when email has no @', async () => { /* ... */ });
+  it('should return 400 when email has no domain', async () => { /* ... */ });
+  it('should return 400 when email is invalid', async () => { /* ... */ });
+  // This duplicates unit test coverage!
+});
+
+// E2E test (WRONG - retesting validation details)
+test('registration form shows error for invalid email', async () => {
+  await page.fill('#email', 'invalid');
+  await page.click('#submit');
+  await expect(page.locator('.error')).toContainText('Invalid email');
+  // This duplicates unit and integration test coverage!
+});
+```
+
+#### ✅ Good Example: Testing at Appropriate Levels
+```typescript
+// Unit test (CORRECT - comprehensive validation testing)
+describe('validateEmail', () => {
+  it('should reject invalid email formats', () => { /* ... */ });
+  it('should reject emails without @', () => { /* ... */ });
+  it('should reject emails without domain', () => { /* ... */ });
+  it('should accept valid emails', () => { /* ... */ });
+});
+
+// Integration test (CORRECT - test validation integration, not details)
+describe('POST /api/auth/register', () => {
+  it('should return 400 when validation fails', async () => {
+    const response = await request.post('/api/auth/register')
+      .send({ email: 'invalid', password: 'test' });
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error');
+  });
+  
+  it('should create user when data is valid', async () => {
+    const response = await request.post('/api/auth/register')
+      .send({ email: 'valid@example.com', password: 'SecurePass123!' });
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty('token');
+  });
+});
+
+// E2E test (CORRECT - test user journey, not validation details)
+test('user can register and login', async () => {
+  await page.goto('/register');
+  await page.fill('#email', 'newuser@example.com');
+  await page.fill('#password', 'SecurePass123!');
+  await page.click('#submit');
+  await expect(page).toHaveURL('/dashboard');
+  // Test the happy path, not every validation error
+});
+```
+
+### Guidelines for Each Layer
+
+#### Unit Tests: Exhaustive Detail Testing
+- Test ALL edge cases, error conditions, and validation rules
+- Test ALL branches and code paths
+- Test ALL business logic scenarios
+- Mock ALL external dependencies
+
+#### Integration Tests: Interface and Flow Testing
+- Test that components work together correctly
+- Test ONE example of validation failure (not all validation rules)
+- Test that data flows correctly through layers
+- Test that HTTP status codes are correct
+- Test that database transactions complete
+- Assume unit tests have covered the details
+
+#### End-to-End Tests: User Journey Testing
+- Test ONLY critical user workflows
+- Test the happy path and ONE major error scenario
+- Test that the system works as a whole
+- Assume integration tests have verified component interactions
+- Assume unit tests have verified business logic
+
+### Decision Matrix: Where to Test What
+
+| What to Test | Unit | Integration | E2E |
+|--------------|------|-------------|-----|
+| Email validation rules | ✅ All rules | ❌ Skip | ❌ Skip |
+| Password strength rules | ✅ All rules | ❌ Skip | ❌ Skip |
+| Business logic edge cases | ✅ All cases | ❌ Skip | ❌ Skip |
+| Error message content | ✅ All messages | ❌ Skip | ❌ Skip |
+| API returns 400 on validation error | ❌ Skip | ✅ One example | ❌ Skip |
+| API returns 201 on success | ❌ Skip | ✅ Test | ❌ Skip |
+| Database transaction completes | ❌ Skip | ✅ Test | ❌ Skip |
+| Middleware chain executes | ❌ Skip | ✅ Test | ❌ Skip |
+| User can complete workflow | ❌ Skip | ❌ Skip | ✅ Test |
+| User sees success message | ❌ Skip | ❌ Skip | ✅ Test |
+| User can navigate app | ❌ Skip | ❌ Skip | ✅ Test |
 
 ## Unit Testing Principles Summary
 
